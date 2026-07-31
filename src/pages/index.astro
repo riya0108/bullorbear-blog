@@ -3,6 +3,8 @@ import Layout from "../layouts/Layout.astro";
 import CategoryCard from "../components/CategoryCard.astro";
 import PostCard from "../components/PostCard.astro";
 import InfographicStrip from "../components/InfographicStrip.astro";
+import InfographicGallery from "../components/InfographicGallery.astro";
+import AlsoCheckOut from "../components/AlsoCheckOut.astro";
 import Icon from "../components/icons/Icon.astro";
 import { getCollection } from "astro:content";
 
@@ -13,6 +15,10 @@ const allPosts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
 
 const latestPosts = allPosts.slice(0, 9);
 const trendingPosts = allPosts.filter((p) => p.data.trending);
+
+const displayedIds = new Set([...latestPosts, ...trendingPosts].map((p) => p.id));
+const archivePosts = allPosts.filter((p) => !displayedIds.has(p.id));
+const alsoCheckOutPosts = archivePosts.slice(-6);
 ---
 
 <Layout
@@ -89,9 +95,13 @@ const trendingPosts = allPosts.filter((p) => p.data.trending);
 		)
 	}
 
+	<AlsoCheckOut posts={alsoCheckOutPosts} />
+
 	<InfographicStrip
 		articleCount={allPosts.length}
 		categoryCount={categories.length}
 		languageCount={14}
 	/>
+
+	<InfographicGallery />
 </Layout>

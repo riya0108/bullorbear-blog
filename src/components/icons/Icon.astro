@@ -288,4 +288,14 @@ const { name, class: className = "" } = Astro.props;
 			</>
 		)
 	}
+	{
+		name === "image-stack" && (
+			<>
+				<rect x="2.5" y="6.5" width="15" height="15" rx="2" />
+				<circle cx="8" cy="12" r="1.6" />
+				<path d="m6 19 3.2-3.6a1.5 1.5 0 0 1 2.15-.1L13 17" />
+				<path d="M7 3.5h11.5a2 2 0 0 1 2 2V16" />
+			</>
+		)
+	}
 </svg>

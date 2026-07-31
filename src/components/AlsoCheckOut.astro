@@ -1,0 +1,154 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getEntry } from "astro:content";
+import Thumbnail from "./Thumbnail.astro";
+
+export interface Props {
+	posts: CollectionEntry<"posts">[];
+}
+
+const { posts } = Astro.props;
+
+const panels = await Promise.all(
+	posts.map(async (post) => ({
+		post,
+		category: await getEntry(post.data.category),
+	})),
+);
+---
+
+{
+	panels.length > 0 && (
+		<section class="py-10 sm:py-14" aria-labelledby="also-check-out-heading">
+			<div class="mx-auto max-w-[1600px] px-5 sm:px-6 lg:px-10 xl:px-16">
+				<p class="reveal inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-mute">
+					From the archive
+				</p>
+				<h2 id="also-check-out-heading" class="reveal mt-1 text-2xl font-extrabold text-ink sm:text-3xl" data-reveal-delay="60">
+					Also Check Out
+				</h2>
+				<p class="reveal mt-2 max-w-xl text-sm text-mute" data-reveal-delay="100">
+					A few older reads worth revisiting, straight from the archive.
+				</p>
+			</div>
+
+			<div id="acsDeck" class="relative mt-6" style={`height:${panels.length * 100}vh`}>
+				<div id="acsStage" class="absolute left-0 top-0 h-screen w-full overflow-hidden">
+					{
+						panels.map(({ post, category }, i) => (
+							<div class="acs-panel absolute inset-0 grid place-items-center px-5 py-10 sm:px-8" style={`z-index:${10 + i}`}>
+								<a
+									href={`/${category?.data.slug}/${post.id}/`}
+									class="acs-card block w-full max-w-xl rounded-3xl bg-surface-card p-6 shadow-[0_40px_80px_-24px_rgba(0,0,0,0.35)] sm:max-w-2xl sm:p-10 lg:max-w-3xl"
+									style="transform-origin:50% 0%"
+								>
+									<div class="overflow-hidden rounded-2xl">
+										<Thumbnail
+											slug={post.id}
+											accentColor={category?.data.accentColor ?? "cat-tech"}
+											src={post.data.heroImage}
+											alt={post.data.heroImageAlt}
+											class="!aspect-[16/10]"
+										/>
+									</div>
+									<h3 class="mt-6 text-2xl font-extrabold text-ink sm:text-3xl">{post.data.title}</h3>
+									<p class="mt-3 line-clamp-2 text-base text-mute sm:text-lg">{post.data.description}</p>
+								</a>
+							</div>
+						))
+					}
+				</div>
+			</div>
+		</section>
+	)
+}
+
+<script>
+	function initAlsoCheckOut() {
+		const deck = document.getElementById("acsDeck");
+		const stage = document.getElementById("acsStage");
+		if (!deck || !stage) return;
+
+		const panels = Array.from(stage.querySelectorAll<HTMLElement>(".acs-panel"));
+		const N = panels.length;
+		if (N === 0) return;
+
+		panels.forEach((panel, i) => {
+			panel.style.zIndex = String(10 + i);
+		});
+
+		const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		if (prefersReduced || N <= 1) {
+			panels.forEach((panel) => {
+				panel.style.transform = "translateY(0)";
+			});
+			return;
+		}
+
+		const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
+
+		function frame() {
+			const vh = window.innerHeight;
+			const rect = deck!.getBoundingClientRect();
+			const total = deck!.offsetHeight - vh;
+
+			if (rect.top > 0) {
+				stage!.style.position = "absolute";
+				stage!.style.top = "0";
+				stage!.style.bottom = "auto";
+			} else if (rect.bottom < vh) {
+				stage!.style.position = "absolute";
+				stage!.style.top = "auto";
+				stage!.style.bottom = "0";
+			} else {
+				stage!.style.position = "fixed";
+				stage!.style.top = "0";
+				stage!.style.bottom = "auto";
+			}
+
+			const p = clamp(total > 0 ? -rect.top / total : 0, 0, 1) * (N - 1);
+
+			panels.forEach((panel, i) => {
+				const off = i - p;
+				const card = panel.querySelector<HTMLElement>(".acs-card");
+
+				if (off >= 0) {
+					panel.style.transform = `translateY(${Math.min(off, 1) * 100}vh)`;
+					if (card) {
+						card.style.transform = "";
+						card.style.filter = "";
+					}
+				} else {
+					const e = clamp(-off, 0, 1);
+					const s = e * e * (3 - 2 * e);
+					panel.style.transform = "translateY(0)";
+					if (card) {
+						card.style.transform = `translateY(${-s * 26}px)`;
+						card.style.filter = `brightness(${1 - 0.42 * s})`;
+					}
+				}
+			});
+		}
+
+		let ticking = false;
+		function onScroll() {
+			if (!ticking) {
+				ticking = true;
+				requestAnimationFrame(() => {
+					frame();
+					ticking = false;
+				});
+			}
+		}
+
+		window.addEventListener("scroll", onScroll, { passive: true });
+		window.addEventListener("resize", frame);
+		frame();
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initAlsoCheckOut);
+	} else {
+		initAlsoCheckOut();
+	}
+</script>

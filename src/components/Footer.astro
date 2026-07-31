@@ -16,20 +16,28 @@ const socialLinks = [
 ];
 ---
 
-<footer class="border-t border-hairline bg-canvas">
-	<div class="mx-auto max-w-[1600px] px-5 py-14 sm:px-6 sm:py-16 lg:px-10 xl:px-16">
+<footer class="relative overflow-hidden border-t border-hairline bg-gradient-to-b from-canvas to-surface-soft">
+	<!-- ambient gradient accents, theme-aware -->
+	<div class="pointer-events-none absolute inset-0" aria-hidden="true">
+		<div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+		<div class="absolute -top-32 left-[-8%] h-64 w-64 rounded-full bg-primary/10 blur-3xl dark:bg-primary/20 sm:h-96 sm:w-96"></div>
+		<div class="absolute -bottom-32 right-[-8%] h-64 w-64 rounded-full bg-[#7e238b]/10 blur-3xl dark:bg-[#c084fc]/15 sm:h-96 sm:w-96"></div>
+	</div>
+
+	<div class="relative mx-auto max-w-[1600px] px-5 py-14 sm:px-6 sm:py-16 lg:px-10 xl:px-16">
 		<div
-			class="reveal flex flex-col items-center gap-8 rounded-[2rem] bg-surface-dark px-6 py-10 sm:px-10"
+			class="reveal relative flex flex-col items-center gap-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-surface-dark via-surface-dark to-[#2a1016] px-6 py-10 sm:px-10 dark:to-[#1f0c11]"
 		>
+			<div class="pointer-events-none absolute -right-16 -top-16 z-0 h-56 w-56 rounded-full bg-primary/25 blur-3xl" aria-hidden="true"></div>
 			<img
 				src="/images/brand/bull-or-bear-daily-wordmark.png"
 				alt="Bull or Bear Daily"
-				class="h-16 w-auto sm:h-24"
+				class="relative z-10 h-16 w-auto sm:h-24"
 				width="1024"
 				height="352"
 				loading="lazy"
 			/>
-			<div class="flex w-full flex-col items-center justify-between gap-6 text-center sm:flex-row sm:items-center sm:text-left">
+			<div class="relative z-10 flex w-full flex-col items-center justify-between gap-6 text-center sm:flex-row sm:items-center sm:text-left">
 			<div class="max-w-md">
 				<h2 class="text-2xl font-extrabold text-on-dark sm:text-3xl">Never miss a signal.</h2>
 				<p class="mt-2 text-sm text-on-dark/70">
@@ -64,8 +72,8 @@ const socialLinks = [
 			</div>
 		</div>
 
-		<div class="mt-14 grid grid-cols-2 gap-8 sm:grid-cols-4">
-			<div class="col-span-2 sm:col-span-1">
+		<div class="mt-14 grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-8 lg:grid-cols-4">
+			<div class="sm:col-span-2 lg:col-span-1">
 				<Logo />
 				<p class="mt-4 max-w-[26ch] text-sm text-mute">{siteConfig.tagline}</p>
 				<div class="mt-5 flex items-center gap-2">
@@ -122,8 +130,16 @@ const socialLinks = [
 			</div>
 		</div>
 
+		<div class="mt-14 select-none overflow-hidden text-center" aria-hidden="true">
+			<p
+				class="whitespace-nowrap bg-gradient-to-b from-ink/70 to-transparent bg-clip-text text-[clamp(2.75rem,13vw,9rem)] font-bold uppercase leading-none tracking-tighter text-transparent"
+			>
+				Bull or Bear
+			</p>
+		</div>
+
 		<div
-			class="mt-12 flex flex-col items-center justify-between gap-3 border-t border-hairline pt-6 text-xs text-mute sm:flex-row"
+			class="mt-2 flex flex-col items-center justify-between gap-3 border-t border-hairline pt-6 text-xs text-mute sm:flex-row"
 		>
 			<p>© {year} {siteConfig.name}. All rights reserved.</p>
 			<p>Built for readers who think in both directions.</p>

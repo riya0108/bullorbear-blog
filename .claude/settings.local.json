@@ -3,7 +3,21 @@
     "allow": [
       "Read(//Users/teri/Downloads/**)",
       "Bash(python3 -)",
-      "Bash(python3 migrate.py)"
+      "Bash(python3 migrate.py)",
+      "Bash(curl -sL -A \"Mozilla/5.0\" --max-time 25 -o 10.png \"https://bullorbear.in/wp-content/uploads/2026/05/How-Vijay-Manages-his-Wealth-scaled.png\")",
+      "Bash(python3 -c ' *)",
+      "Bash(curl -sI http://localhost:4321/images/infographics/zomato-or-swiggy.webp)",
+      "Bash(curl -s \"http://localhost:4321/src/components/ScrollProgressBar.astro?astro&type=script&index=0&lang.ts\" -w \"\\\\n[%{http_code}]\\\\n\")",
+      "Bash(curl -s \"http://localhost:4321/src/components/AlsoCheckOut.astro?astro&type=script&index=0&lang.ts\" -w \"\\\\n[%{http_code}]\\\\n\")",
+      "Bash(python3 -c \"import websocket\")",
+      "Bash(python3 -c \"import websockets\")",
+      "Bash(node -e \"require\\('ws'\\)\")",
+      "Bash(grep -i \"^ws$\")",
+      "Bash(node *)",
+      "Bash(pkill -f \"remote-debugging-port=9333\")",
+      "Bash(curl *)",
+      "Bash(npx astro *)",
+      "Bash(astro dev *)"
     ]
   }
 }
