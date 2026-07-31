@@ -1,0 +1,211 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* ---------------------------------------------------------------------
+   Bull or Bear Blogs — design tokens
+   Adapted from DESIGN.md (Pinterest system): cream chrome, single red
+   accent reserved for CTAs, 16px/32px/pill radius scale, Inter (Pin Sans
+   substitute) via the system-font fallback stack DESIGN.md documents.
+   --------------------------------------------------------------------- */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+	--font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+		sans-serif;
+
+	/* Brand — reserved strictly for primary CTAs / active states */
+	--color-primary: #e60023;
+	--color-primary-pressed: #cc001f;
+
+	/* Semantic */
+	--color-focus-outer: #435ee5;
+	--color-success-deep: #103c25;
+	--color-success-pale: #c7f0da;
+	--color-error: #9e0a0a;
+	--color-error-deep: #cc001f;
+
+	/* Bull/bear brand extension — icon & badge accents only, never a button fill */
+	--color-bull: #16a34a;
+	--color-bull-dark: #4ade80;
+	--color-bear: #e60023;
+
+	/* Category wayfinding accents — small dots/badges only */
+	--color-cat-ai: #7e238b;
+	--color-cat-ai-dark: #c084fc;
+	--color-cat-tech: #3b5bdb;
+	--color-cat-tech-dark: #7dabff;
+	--color-cat-money: #166534;
+	--color-cat-money-dark: #4ade80;
+	--color-cat-finance: #0f766e;
+	--color-cat-finance-dark: #2dd4bf;
+	--color-cat-politics: #b45309;
+	--color-cat-politics-dark: #fbbf24;
+	--color-cat-personal-finance: #be185d;
+	--color-cat-personal-finance-dark: #f472b6;
+	--color-cat-world: #1d4ed8;
+	--color-cat-world-dark: #93c5fd;
+	--color-cat-business: #a16207;
+	--color-cat-business-dark: #fcd34d;
+	--color-cat-lifestyle: #c026d3;
+	--color-cat-lifestyle-dark: #f0abfc;
+
+	/* Shape — three radii in active use, matching DESIGN.md exactly */
+	--radius-sm: 0.5rem; /* 8px  — rare */
+	--radius-md: 1rem; /* 16px — dominant component radius */
+	--radius-lg: 2rem; /* 32px — large cards & modals */
+}
+
+/* Theme-switching surface/text tokens: raw values live/light-dark below,
+   `@theme inline` re-exposes them as `--color-*` so every `bg-canvas`,
+   `text-ink`, etc. utility repaints automatically when `.dark` toggles —
+   no need to sprinkle `dark:` on hundreds of elements. */
+:root {
+	--canvas: #ffffff;
+	--surface-soft: #fbfbf9;
+	--surface-card: #f6f6f3;
+	--secondary-bg: #e5e5e0;
+	--secondary-pressed: #c8c8c1;
+	--surface-dark: #262622;
+	--hairline: #dadad3;
+	--hairline-soft: #e5e5e0;
+	--ink: #000000;
+	--ink-soft: #211922;
+	--body-text: #33332e;
+	--charcoal: #262622;
+	--mute: #62625b;
+	--ash: #7a7a72;
+	--stone: #c8c8c1;
+	--on-dark: #ffffff;
+	--focus-inner: #ffffff;
+}
+
+:root.dark {
+	--canvas: #17140f;
+	--surface-soft: #1c1914;
+	--surface-card: #211d17;
+	--secondary-bg: #2a251d;
+	--secondary-pressed: #383025;
+	--surface-dark: #0e0c09;
+	--hairline: #35302a;
+	--hairline-soft: #2a251d;
+	--ink: #f5f3ef;
+	--ink-soft: #ece6e8;
+	--body-text: #d8d5cd;
+	--charcoal: #cfccc3;
+	--mute: #a39e91;
+	--ash: #7d7768;
+	--stone: #565042;
+	--on-dark: #ffffff;
+	--focus-inner: #17140f;
+}
+
+@theme inline {
+	--color-canvas: var(--canvas);
+	--color-surface-soft: var(--surface-soft);
+	--color-surface-card: var(--surface-card);
+	--color-secondary-bg: var(--secondary-bg);
+	--color-secondary-pressed: var(--secondary-pressed);
+	--color-surface-dark: var(--surface-dark);
+	--color-hairline: var(--hairline);
+	--color-hairline-soft: var(--hairline-soft);
+	--color-ink: var(--ink);
+	--color-ink-soft: var(--ink-soft);
+	--color-body: var(--body-text);
+	--color-charcoal: var(--charcoal);
+	--color-mute: var(--mute);
+	--color-ash: var(--ash);
+	--color-stone: var(--stone);
+	--color-on-dark: var(--on-dark);
+	--color-focus-inner: var(--focus-inner);
+}
+
+/* ---------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------- */
+
+html {
+	scroll-behavior: smooth;
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	font-family: var(--font-sans);
+	background-color: var(--color-canvas);
+	color: var(--color-body);
+	-webkit-font-smoothing: antialiased;
+}
+
+::selection {
+	background-color: var(--color-primary);
+	color: #fff;
+}
+
+:focus-visible {
+	outline: 3px solid var(--color-focus-outer);
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+
+.skip-link {
+	position: absolute;
+	left: 1rem;
+	top: -4rem;
+	z-index: 100;
+	background: var(--color-primary);
+	color: #fff;
+	padding: 0.75rem 1.25rem;
+	border-radius: var(--radius-md);
+	font-weight: 700;
+	transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+	top: 1rem;
+}
+
+/* Scroll-reveal utility — see src/scripts/reveal.ts */
+.reveal {
+	opacity: 0;
+	transform: translateY(24px);
+	transition:
+		opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+		transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.is-visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.reveal {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.001ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.001ms !important;
+		scroll-behavior: auto !important;
+	}
+}
+
+/* Google Translate widget — hide default banner/iframe chrome, we drive it
+   with our own <select>. See src/components/LanguageSwitcher.astro */
+.goog-te-banner-frame,
+.skiptranslate > iframe {
+	display: none !important;
+}
+
+body {
+	top: 0 !important;
+}
+
+#google_translate_element {
+	display: none;
+}

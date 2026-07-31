@@ -1,46 +1,35 @@
-# Astro Starter Kit: Basics
+# Bull or Bear Blogs
 
-```sh
-npm create astro@latest -- --template basics
-```
+Independent coverage of AI, Tech, Money, Finance, Politics, and Personal Finance — built with [Astro](https://astro.build), Tailwind CSS v4, and a handful of React islands for the heavier interactions.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Stack
 
-## 🚀 Project Structure
+- **Astro 7** (static output) with **MDX** content collections
+- **Tailwind CSS v4** (`@tailwindcss/vite`, CSS-first `@theme` config in `src/styles/global.css`)
+- **React + Framer Motion** for exactly two islands: the card pop/highlight interaction (`CardInteractionLayer`) and the animated stat counters (`StatCounters`)
+- **Fuse.js** for client-side fuzzy search (`/search/`, backed by `/search-index.json`)
+- Everything else — scroll reveal, reading-progress ring, text-to-speech, language switcher, dark mode, share — is plain TypeScript, no framework
 
-Inside of your Astro project, you'll see the following folders and files:
+## Commands
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
+| Command                | Action                                       |
+| :---------------------- | :-------------------------------------------- |
+| `npm install`            | Install dependencies                          |
+| `astro dev --background` | Start the dev server in the background        |
+| `astro dev stop`         | Stop the background dev server                |
+| `astro dev status`       | Check whether the dev server is running       |
+| `astro dev logs`         | Tail the background dev server's logs         |
+| `npm run build`          | Build the production site to `./dist/`        |
+| `npm run preview`        | Preview the production build locally          |
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Content
 
-## 🧞 Commands
+Blog posts live in `src/content/posts/*.mdx`; categories are defined in `src/content/categories.json`. Add a new post by dropping an `.mdx` file with the frontmatter shape defined in `src/content.config.ts`.
 
-All commands are run from the root of the project, from a terminal:
+## Things to wire up before launch
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- **Comments** — copy `.env.example` to `.env`, create a GitHub repo with Discussions enabled, and fill in the `PUBLIC_GISCUS_*` values from [giscus.app](https://giscus.app). Until then, post pages show a "comments aren't connected yet" placeholder.
+- **Newsletter form / contact form** — currently client-side only (shows a success state, sends nothing). Wire up to a real email provider or endpoint.
+- **Social links** — `src/lib/siteConfig.ts` has placeholder Instagram/YouTube/Facebook/Threads/X handles; replace with the real accounts.
+- **Thumbnails** — posts use generated abstract gradient art (`src/components/Thumbnail.astro`) rather than photography. Add a `heroImage` to a post's frontmatter (and wire it into the schema) if you want real images later.
+- **Translation** — the language switcher drives the Google Translate widget (free, client-side, no API key). Swap in DeepL/Cloud Translate later for higher quality.

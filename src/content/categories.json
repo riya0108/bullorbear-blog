@@ -1,0 +1,74 @@
+[
+	{
+		"id": "ai",
+		"slug": "ai",
+		"name": "AI",
+		"description": "Artificial intelligence, machine learning, and the tools reshaping how we work.",
+		"icon": "cat-ai",
+		"accentColor": "cat-ai"
+	},
+	{
+		"id": "tech",
+		"slug": "tech",
+		"name": "Tech",
+		"description": "Gadgets, software, and the technology stories that actually matter.",
+		"icon": "cat-tech",
+		"accentColor": "cat-tech"
+	},
+	{
+		"id": "money",
+		"slug": "money",
+		"name": "Money",
+		"description": "Markets, investing, and where the smart money is moving.",
+		"icon": "cat-money",
+		"accentColor": "cat-money"
+	},
+	{
+		"id": "finance",
+		"slug": "finance",
+		"name": "Finance",
+		"description": "Corporate finance, banking, and the macro forces behind the headlines.",
+		"icon": "cat-finance",
+		"accentColor": "cat-finance"
+	},
+	{
+		"id": "politics",
+		"slug": "politics",
+		"name": "Politics",
+		"description": "Policy and politics, read through the lens of markets and money.",
+		"icon": "cat-politics",
+		"accentColor": "cat-politics"
+	},
+	{
+		"id": "personal-finance",
+		"slug": "personal-finance",
+		"name": "Personal Finance",
+		"description": "Budgeting, saving, and building wealth in the real world.",
+		"icon": "cat-personal-finance",
+		"accentColor": "cat-personal-finance"
+	},
+	{
+		"id": "world",
+		"slug": "world",
+		"name": "World",
+		"description": "Geopolitics, wars, and the global events moving markets.",
+		"icon": "cat-world",
+		"accentColor": "cat-world"
+	},
+	{
+		"id": "business",
+		"slug": "business",
+		"name": "Business",
+		"description": "Companies, business models, and the deals behind the headlines.",
+		"icon": "cat-business",
+		"accentColor": "cat-business"
+	},
+	{
+		"id": "lifestyle",
+		"slug": "lifestyle",
+		"name": "Lifestyle",
+		"description": "Culture, mindset, and how money and modern life collide.",
+		"icon": "cat-lifestyle",
+		"accentColor": "cat-lifestyle"
+	}
+]

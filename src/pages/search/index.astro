@@ -1,0 +1,111 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Icon from "../../components/icons/Icon.astro";
+---
+
+<Layout title="Search" description="Search every Bull or Bear Blogs article." noIndex>
+	<section class="mx-auto max-w-3xl px-5 pb-6 pt-14 sm:px-6 sm:pt-20">
+		<h1 class="text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">Search articles</h1>
+		<div class="mt-6 flex h-14 items-center gap-3 rounded-full bg-surface-card px-5">
+			<Icon name="search" class="h-5 w-5 shrink-0 text-ash" />
+			<input
+				id="search-input"
+				type="search"
+				placeholder="Try “AI agents”, “emergency fund”, “central banks”…"
+				class="h-full w-full bg-transparent text-base text-ink placeholder:text-ash focus:outline-none"
+				autofocus
+			/>
+		</div>
+		<p id="search-status" class="mt-4 text-sm text-mute"></p>
+	</section>
+
+	<section class="mx-auto max-w-3xl px-5 pb-20 sm:px-6">
+		<div id="search-results" class="flex flex-col divide-y divide-hairline"></div>
+	</section>
+</Layout>
+
+<script>
+	import Fuse from "fuse.js";
+	import { dotClass, textClass } from "../../lib/categoryStyles";
+
+	interface SearchDoc {
+		title: string;
+		description: string;
+		url: string;
+		category: string;
+		accentColor: string;
+		tags: string[];
+		author: string;
+		pubDate: string;
+		readingTime: string;
+	}
+
+	const input = document.getElementById("search-input") as HTMLInputElement;
+	const status = document.getElementById("search-status")!;
+	const results = document.getElementById("search-results")!;
+
+	function escapeHtml(str: string) {
+		return str.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+	}
+
+	function render(docs: SearchDoc[], query: string) {
+		if (docs.length === 0) {
+			status.textContent = query ? `No results for “${query}”.` : "";
+			results.innerHTML = "";
+			return;
+		}
+		status.textContent = query ? `${docs.length} result${docs.length === 1 ? "" : "s"} for “${query}”` : `${docs.length} articles`;
+		results.innerHTML = docs
+			.map(
+				(doc) => `
+			<a href="${doc.url}" class="group block py-5 first:pt-0">
+				<span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide">
+					<span class="h-2 w-2 rounded-full ${dotClass(doc.accentColor)}"></span>
+					<span class="${textClass(doc.accentColor)}">${escapeHtml(doc.category)}</span>
+				</span>
+				<h2 class="mt-1.5 text-lg font-bold text-ink group-hover:text-primary">${escapeHtml(doc.title)}</h2>
+				<p class="mt-1 line-clamp-2 text-sm text-mute">${escapeHtml(doc.description)}</p>
+				<p class="mt-2 text-xs text-mute">${escapeHtml(doc.author)} · ${doc.readingTime}</p>
+			</a>
+		`,
+			)
+			.join("");
+	}
+
+	async function init() {
+		status.textContent = "Loading…";
+		const docs: SearchDoc[] = await fetch("/search-index.json").then((r) => r.json());
+		const fuse = new Fuse(docs, {
+			keys: ["title", "description", "tags", "category"],
+			threshold: 0.35,
+		});
+
+		const params = new URLSearchParams(window.location.search);
+		const initialQuery = params.get("q") ?? "";
+		input.value = initialQuery;
+
+		const runSearch = (query: string) => {
+			if (!query.trim()) {
+				render(
+					[...docs].sort((a, b) => new Date(b.pubDate).valueOf() - new Date(a.pubDate).valueOf()),
+					"",
+				);
+				return;
+			}
+			render(
+				fuse.search(query).map((r) => r.item),
+				query,
+			);
+		};
+
+		runSearch(initialQuery);
+
+		let debounce: ReturnType<typeof setTimeout>;
+		input.addEventListener("input", () => {
+			clearTimeout(debounce);
+			debounce = setTimeout(() => runSearch(input.value), 150);
+		});
+	}
+
+	init();
+</script>

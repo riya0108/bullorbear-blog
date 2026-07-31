@@ -1,0 +1,55 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { siteConfig } from "../../lib/siteConfig";
+---
+
+<Layout
+	title="About"
+	description="Bull or Bear Blogs is a platform dedicated to simplifying personal finance, investing, and wealth creation for everyday people."
+>
+	<section class="mx-auto max-w-3xl px-5 py-16 sm:px-6 sm:py-20">
+		<h1 class="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">About {siteConfig.name}</h1>
+		<div class="prose prose-neutral mt-8 max-w-none prose-headings:font-extrabold prose-headings:text-ink prose-p:text-body prose-a:font-semibold prose-a:text-primary prose-li:text-body dark:prose-invert">
+			<p>
+				Welcome to {siteConfig.name} — a platform dedicated to simplifying personal finance,
+				investing, and wealth creation for everyday people. Our goal is to make financial education
+				simple, practical, and accessible. We believe financial literacy is one of the most
+				important life skills, yet most people are never properly taught how money, investing,
+				budgeting, or wealth-building actually work.
+			</p>
+			<h2>Our mission</h2>
+			<p>Our mission is to help people:</p>
+			<ul>
+				<li>Make smarter financial decisions</li>
+				<li>Avoid common money mistakes</li>
+				<li>Understand investing and personal finance</li>
+				<li>Build long-term wealth</li>
+				<li>Improve financial discipline and awareness</li>
+			</ul>
+			<p>
+				We write across <strong>World</strong>, <strong>Money</strong>, <strong>Finance</strong>, <strong>Personal Finance</strong>, <strong>Politics</strong>, <strong>Business</strong>, <strong>Tech</strong>, <strong>AI</strong>, and <strong>Lifestyle</strong> — covering financial planning, budgeting, investing, mutual funds, SIPs, trading psychology, credit cards, and the economic and political stories that move markets.
+			</p>
+			<h2>Why {siteConfig.name}?</h2>
+			<p>
+				The financial world is filled with confusing jargon, misinformation, and emotionally-driven
+				advice. {siteConfig.name} was created to break down complex financial topics into
+				easy-to-understand content that actually helps readers take action — whether you're a
+				beginner starting your financial journey or someone looking to sharpen your money
+				management skills.
+			</p>
+			<h2>What we're not</h2>
+			<p>
+				We're not a licensed investment, legal, or tax advisor, and nothing on this site is
+				financial advice. Our content is created through research, analysis, and educational
+				interpretation of publicly available financial information. Readers are encouraged to do
+				their own research and consult certified professionals before making financial or
+				investment decisions.
+			</p>
+			<h2>Get in touch</h2>
+			<p>
+				Have a tip, a correction, or a topic you think we're missing? <a href="/contact/">Reach out</a>
+				 — we read everything.
+			</p>
+		</div>
+	</section>
+</Layout>

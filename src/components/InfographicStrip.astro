@@ -1,0 +1,61 @@
+---
+import StatCounters from "./react/StatCounters";
+import type { Stat } from "./react/StatCounters";
+
+export interface Props {
+	articleCount: number;
+	categoryCount: number;
+	languageCount: number;
+}
+
+const { articleCount, categoryCount, languageCount } = Astro.props;
+
+const stats: Stat[] = [
+	{ label: "Articles published", value: articleCount, suffix: "+" },
+	{ label: "Topics covered", value: categoryCount },
+	{ label: "Monthly readers", value: 42000, suffix: "+" },
+	{ label: "Languages supported", value: languageCount },
+];
+
+const sentimentPoints = "0,58 40,42 80,50 120,20 160,34 200,12 240,26 280,8";
+---
+
+<section
+	class="mx-auto max-w-[1600px] px-5 py-14 sm:px-6 sm:py-20 lg:px-10 xl:px-16"
+	aria-labelledby="by-the-numbers"
+>
+	<div class="reveal grid gap-10 rounded-[2rem] bg-surface-card p-6 sm:p-10 lg:grid-cols-[1.3fr_1fr] lg:gap-16 lg:p-14">
+		<div>
+			<h2 id="by-the-numbers" class="text-2xl font-extrabold text-ink sm:text-3xl">
+				Bull or Bear, by the numbers
+			</h2>
+			<p class="mt-2 max-w-md text-sm text-mute">
+				A growing library of independent reads across markets, money, and machines.
+			</p>
+			<div class="mt-8">
+				<StatCounters client:visible stats={stats} />
+			</div>
+		</div>
+
+		<div class="flex flex-col justify-between rounded-3xl bg-canvas p-6">
+			<div class="flex items-center justify-between">
+				<h3 class="text-sm font-bold text-ink">Bull vs. Bear Sentiment</h3>
+				<span class="text-[10px] font-bold uppercase tracking-wide text-mute">Illustrative</span>
+			</div>
+			<svg viewBox="0 0 280 70" class="mt-4 h-24 w-full" preserveAspectRatio="none" aria-hidden="true">
+				<polyline
+					points={sentimentPoints}
+					fill="none"
+					stroke="var(--color-bull)"
+					stroke-width="2.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				/>
+			</svg>
+			<p class="mt-3 text-xs text-mute">
+				A sample sentiment curve — not live market data. Real signals live inside our Money and
+				Finance coverage.
+			</p>
+		</div>
+	</div>
+</section>

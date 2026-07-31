@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/teri/Downloads/**)",
+      "Bash(python3 -)",
+      "Bash(python3 migrate.py)"
+    ]
+  }
+}

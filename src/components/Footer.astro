@@ -1,0 +1,164 @@
+---
+import { getCollection } from "astro:content";
+import Logo from "./Logo.astro";
+import Icon from "./icons/Icon.astro";
+import { siteConfig } from "../lib/siteConfig";
+
+const categories = await getCollection("categories");
+const year = new Date().getFullYear();
+
+const socialLinks = [
+	{ name: "Instagram", icon: "instagram", href: siteConfig.social.instagram },
+	{ name: "YouTube", icon: "youtube", href: siteConfig.social.youtube },
+	{ name: "Facebook", icon: "facebook", href: siteConfig.social.facebook },
+	{ name: "Threads", icon: "threads", href: siteConfig.social.threads },
+	{ name: "X", icon: "x-social", href: siteConfig.social.x },
+];
+---
+
+<footer class="border-t border-hairline bg-canvas">
+	<div class="mx-auto max-w-[1600px] px-5 py-14 sm:px-6 sm:py-16 lg:px-10 xl:px-16">
+		<div
+			class="reveal flex flex-col items-center gap-8 rounded-[2rem] bg-surface-dark px-6 py-10 sm:px-10"
+		>
+			<img
+				src="/images/brand/bull-or-bear-daily-wordmark.png"
+				alt="Bull or Bear Daily"
+				class="h-16 w-auto sm:h-24"
+				width="1024"
+				height="352"
+				loading="lazy"
+			/>
+			<div class="flex w-full flex-col items-center justify-between gap-6 text-center sm:flex-row sm:items-center sm:text-left">
+			<div class="max-w-md">
+				<h2 class="text-2xl font-extrabold text-on-dark sm:text-3xl">Never miss a signal.</h2>
+				<p class="mt-2 text-sm text-on-dark/70">
+					One email a week: the sharpest reads across AI, markets, and money. No noise.
+				</p>
+			</div>
+			<div class="w-full max-w-sm">
+				<form class="newsletter-form flex w-full flex-col gap-3 sm:flex-row" novalidate>
+					<label class="sr-only" for="newsletter-email">Email address</label>
+					<input
+						id="newsletter-email"
+						type="email"
+						required
+						placeholder="you@email.com"
+						aria-describedby="newsletter-error"
+						class="h-12 w-full rounded-full border-2 border-transparent bg-white/10 px-4 text-sm text-on-dark placeholder:text-on-dark/50 focus:bg-white/15 focus:outline-none aria-invalid:border-error-deep"
+					/>
+					<button
+						type="submit"
+						class="h-12 shrink-0 rounded-full bg-primary px-6 text-sm font-bold text-white transition-colors hover:bg-primary-pressed"
+					>
+						Subscribe
+					</button>
+				</form>
+				<p id="newsletter-error" class="newsletter-error mt-2 hidden text-sm font-semibold text-error-deep" role="alert">
+					Enter a valid email address (e.g. you@example.com).
+				</p>
+				<p class="newsletter-success hidden text-sm font-semibold text-on-dark">
+					You're in. Watch your inbox. 🎉
+				</p>
+			</div>
+			</div>
+		</div>
+
+		<div class="mt-14 grid grid-cols-2 gap-8 sm:grid-cols-4">
+			<div class="col-span-2 sm:col-span-1">
+				<Logo />
+				<p class="mt-4 max-w-[26ch] text-sm text-mute">{siteConfig.tagline}</p>
+				<div class="mt-5 flex items-center gap-2">
+					{
+						socialLinks.map((s) => (
+							<a
+								href={s.href}
+								target="_blank"
+								rel="noopener noreferrer"
+								aria-label={s.name}
+								class="grid h-10 w-10 place-items-center rounded-full bg-surface-card text-ink transition-colors hover:bg-primary hover:text-white"
+							>
+								<Icon name={s.icon} class="h-4.5 w-4.5" />
+							</a>
+						))
+					}
+				</div>
+			</div>
+
+			<div>
+				<h3 class="text-xs font-bold uppercase tracking-wide text-mute">Explore</h3>
+				<ul class="mt-4 space-y-3 text-sm">
+					<li><a href="/latest/" class="text-body hover:text-primary">Latest</a></li>
+					<li><a href="/trending/" class="text-body hover:text-primary">Trending</a></li>
+					<li><a href="/search/" class="text-body hover:text-primary">Search</a></li>
+					<li><a href="/about/" class="text-body hover:text-primary">About</a></li>
+					<li><a href="/contact/" class="text-body hover:text-primary">Contact</a></li>
+				</ul>
+			</div>
+
+			<div>
+				<h3 class="text-xs font-bold uppercase tracking-wide text-mute">Topics</h3>
+				<ul class="mt-4 space-y-3 text-sm">
+					{
+						categories.map((cat) => (
+							<li>
+								<a href={`/${cat.data.slug}/`} class="text-body hover:text-primary">
+									{cat.data.name}
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+
+			<div>
+				<h3 class="text-xs font-bold uppercase tracking-wide text-mute">Legal</h3>
+				<ul class="mt-4 space-y-3 text-sm">
+					<li><a href="/privacy/" class="text-body hover:text-primary">Privacy Policy</a></li>
+					<li><a href="/terms/" class="text-body hover:text-primary">Terms and Conditions</a></li>
+					<li><a href="/editorial-policy/" class="text-body hover:text-primary">Editorial Policy</a></li>
+					<li><a href="/disclaimer/" class="text-body hover:text-primary">Disclaimer</a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div
+			class="mt-12 flex flex-col items-center justify-between gap-3 border-t border-hairline pt-6 text-xs text-mute sm:flex-row"
+		>
+			<p>© {year} {siteConfig.name}. All rights reserved.</p>
+			<p>Built for readers who think in both directions.</p>
+		</div>
+	</div>
+</footer>
+
+<script>
+	const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+	const form = document.querySelector<HTMLFormElement>(".newsletter-form");
+	const input = form?.querySelector<HTMLInputElement>("#newsletter-email");
+	const error = document.querySelector<HTMLElement>(".newsletter-error");
+
+	form?.addEventListener("submit", (e) => {
+		e.preventDefault();
+		const value = input?.value.trim() ?? "";
+
+		if (!EMAIL_PATTERN.test(value)) {
+			error?.classList.remove("hidden");
+			input?.setAttribute("aria-invalid", "true");
+			input?.focus();
+			return;
+		}
+
+		error?.classList.add("hidden");
+		input?.removeAttribute("aria-invalid");
+		form.classList.add("hidden");
+		document.querySelector(".newsletter-success")?.classList.remove("hidden");
+	});
+
+	input?.addEventListener("input", () => {
+		if (!error?.classList.contains("hidden")) {
+			error.classList.add("hidden");
+			input.removeAttribute("aria-invalid");
+		}
+	});
+</script>

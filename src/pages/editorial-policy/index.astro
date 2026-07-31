@@ -1,0 +1,56 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { siteConfig } from "../../lib/siteConfig";
+---
+
+<Layout title="Editorial Policy" description={`Editorial policy for ${siteConfig.name}.`} noIndex>
+	<section class="mx-auto max-w-3xl px-5 py-16 sm:px-6 sm:py-20">
+		<h1 class="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">Editorial Policy</h1>
+		<div class="prose prose-neutral mt-8 max-w-none prose-headings:font-extrabold prose-headings:text-ink prose-p:text-body prose-li:text-body dark:prose-invert">
+			<p>
+				At {siteConfig.name}, our editorial goal is to provide educational, accurate, and
+				reader-focused financial content. We are committed to maintaining transparency, quality,
+				and integrity in everything we publish.
+			</p>
+			<h2>Content standards</h2>
+			<p>Every article published on {siteConfig.name} is created with the intention of:</p>
+			<ul>
+				<li>Educating readers</li>
+				<li>Simplifying financial concepts</li>
+				<li>Providing practical insights</li>
+				<li>Encouraging informed financial decisions</li>
+			</ul>
+			<h2>Research and accuracy</h2>
+			<p>
+				We strive to ensure that the information published on this website is accurate and up to
+				date at the time of publication. Our content may reference RBI, SEBI, NSE, government
+				publications, financial institutions, public financial data, and reputed news and
+				educational sources. However, financial information can change over time, and we cannot
+				guarantee complete accuracy at all times.
+			</p>
+			<h2>Editorial independence</h2>
+			<p>
+				{siteConfig.name} maintains editorial independence. Opinions expressed in articles belong
+				to the respective authors and are not influenced by advertisers or external parties.
+			</p>
+			<h2>AI-assisted content</h2>
+			<p>
+				Some content may involve the use of AI-assisted tools for research support, structuring, or
+				drafting purposes. All content is reviewed, edited, and refined before publication to
+				ensure quality and relevance.
+			</p>
+			<h2>No financial advice</h2>
+			<p>
+				The content published on {siteConfig.name} is intended for informational and educational
+				purposes only and should not be considered professional financial, investment, legal, or
+				tax advice. Readers should consult certified professionals before making financial
+				decisions.
+			</p>
+			<h2>Corrections policy</h2>
+			<p>
+				If any factual errors are identified, we aim to correct them promptly. For corrections or
+				concerns, <a href="/contact/" class="font-semibold text-primary">contact us</a>.
+			</p>
+		</div>
+	</section>
+</Layout>

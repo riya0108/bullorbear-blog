@@ -1,0 +1,130 @@
+---
+import { getCollection, getEntry, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Icon from "../../components/icons/Icon.astro";
+import AuthorAvatar from "../../components/AuthorAvatar.astro";
+import ReadingProgressRing from "../../components/ReadingProgressRing.astro";
+import ListenButton from "../../components/ListenButton.astro";
+import ShareBar from "../../components/ShareBar.astro";
+import Comments from "../../components/Comments.astro";
+import PostCard from "../../components/PostCard.astro";
+import { dotClass, textClass } from "../../lib/categoryStyles";
+import { readingTime } from "../../lib/readingTime";
+import { stripMarkdown } from "../../lib/stripMarkdown";
+
+export async function getStaticPaths() {
+	const posts = await getCollection("posts", ({ data }) => !data.draft);
+	const paths = [];
+	for (const post of posts) {
+		const category = await getEntry(post.data.category);
+		if (!category) continue;
+		paths.push({ params: { category: category.data.slug, slug: post.id }, props: { post, category } });
+	}
+	return paths;
+}
+
+const { post, category } = Astro.props;
+const { Content } = await render(post);
+const time = readingTime(post.body);
+const plainText = stripMarkdown(post.body);
+const dateLabel = post.data.pubDate.toLocaleDateString("en-IN", {
+	month: "long",
+	day: "numeric",
+	year: "numeric",
+});
+
+const allPosts = await getCollection("posts", ({ data }) => !data.draft);
+const relatedPosts = allPosts
+	.filter((p) => p.id !== post.id && p.data.category.id === post.data.category.id)
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 3);
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+---
+
+<Layout
+	title={post.data.title}
+	description={post.data.description}
+	image={post.data.heroImage}
+	type="article"
+	article={{
+		publishedTime: post.data.pubDate.toISOString(),
+		modifiedTime: post.data.updatedDate?.toISOString(),
+		author: post.data.author.name,
+		category: category.data.name,
+		tags: post.data.tags,
+	}}
+>
+	<ReadingProgressRing minutes={time.minutes} targetId="article-content" />
+
+	<article id="article-content" class="mx-auto max-w-4xl px-5 pb-8 pt-12 sm:px-6 sm:pt-16 lg:px-10">
+		<a
+			href={`/${category.data.slug}/`}
+			class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide"
+		>
+			<span class={`h-2 w-2 rounded-full ${dotClass(category.data.accentColor)}`}></span>
+			<span class={textClass(category.data.accentColor)}>{category.data.name}</span>
+		</a>
+
+		<h1 class="mt-4 text-3xl font-extrabold leading-tight tracking-tight text-ink sm:text-5xl">
+			{post.data.title}
+		</h1>
+		<p class="mt-4 text-lg text-mute">{post.data.description}</p>
+
+		<div class="mt-6 flex flex-wrap items-center gap-3 border-y border-hairline py-4">
+			<AuthorAvatar name={post.data.author.name} class="h-10 w-10" />
+			<div class="text-sm">
+				<p class="font-bold text-ink">{post.data.author.name}</p>
+				<div class="flex flex-wrap items-center gap-x-2 text-xs text-mute">
+					<time datetime={post.data.pubDate.toISOString()}>{dateLabel}</time>
+					<span aria-hidden="true">·</span>
+					<span class="inline-flex items-center gap-1">
+						<Icon name="clock" class="h-3.5 w-3.5" />
+						{time.label}
+					</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+			<ListenButton text={plainText} />
+			<ShareBar title={post.data.title} url={canonicalUrl} />
+		</div>
+
+		<div
+			id="article-body"
+			class="prose prose-neutral mt-10 max-w-none prose-headings:font-extrabold prose-headings:tracking-tight prose-headings:text-ink prose-p:text-body prose-a:font-semibold prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-primary prose-blockquote:font-normal prose-blockquote:not-italic prose-blockquote:text-mute prose-strong:text-ink prose-code:text-ink prose-li:text-body dark:prose-invert"
+		>
+			<Content />
+		</div>
+
+		<div class="mt-10 flex flex-wrap gap-2">
+			{
+				post.data.tags.map((tag) => (
+					<span class="rounded-full bg-surface-card px-3 py-1 text-xs font-semibold text-mute">#{tag}</span>
+				))
+			}
+		</div>
+
+		<div class="mt-8 border-t border-hairline pt-6">
+			<ShareBar title={post.data.title} url={canonicalUrl} />
+		</div>
+	</article>
+
+	{
+		relatedPosts.length > 0 && (
+			<section class="mx-auto max-w-5xl px-5 py-10 sm:px-6" aria-labelledby="related-heading">
+				<h2 id="related-heading" class="text-xl font-extrabold text-ink">
+					More in {category.data.name}
+				</h2>
+				<div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
+					{relatedPosts.map((p) => (
+						<PostCard post={p} />
+					))}
+				</div>
+			</section>
+		)
+	}
+
+	<Comments />
+</Layout>

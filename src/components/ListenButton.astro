@@ -1,0 +1,347 @@
+---
+import Icon from "./icons/Icon.astro";
+import { languages } from "../lib/i18n";
+
+export interface Props {
+	text: string;
+}
+
+const { text } = Astro.props;
+---
+
+<div class="flex flex-wrap items-center gap-3" data-tts-widget>
+	<button
+		id="tts-toggle"
+		type="button"
+		class="inline-flex h-11 items-center gap-2 rounded-full bg-surface-card px-5 text-sm font-bold text-ink transition-colors hover:bg-secondary-bg"
+	>
+		<Icon name="headphones" class="h-4.5 w-4.5" />
+		<span data-tts-icon="play"><Icon name="play" class="h-4 w-4" /></span>
+		<span data-tts-icon="pause" class="hidden"><Icon name="pause" class="h-4 w-4" /></span>
+		<span data-tts-label>Listen to this article</span>
+	</button>
+	<button
+		id="tts-stop"
+		type="button"
+		class="hidden h-11 items-center gap-1.5 rounded-full bg-surface-card px-4 text-sm font-bold text-ink hover:bg-secondary-bg"
+	>
+		<Icon name="stop" class="h-4 w-4" />
+		Stop
+	</button>
+	<label class="flex items-center gap-1.5 text-xs font-semibold text-mute">
+		Language
+		<select
+			id="tts-lang"
+			class="notranslate h-8 rounded-full bg-surface-card px-2 text-xs font-bold text-ink focus:outline-none"
+		>
+			{languages.map((l) => <option value={l.code}>{l.label}</option>)}
+		</select>
+	</label>
+	<label class="flex items-center gap-1.5 text-xs font-semibold text-mute">
+		Speed
+		<select
+			id="tts-rate"
+			class="h-8 rounded-full bg-surface-card px-2 text-xs font-bold text-ink focus:outline-none"
+		>
+			<option value="0.75">0.75x</option>
+			<option value="1" selected>1x</option>
+			<option value="1.25">1.25x</option>
+			<option value="1.5">1.5x</option>
+		</select>
+	</label>
+</div>
+
+<script type="application/json" id="tts-text" set:html={JSON.stringify(text)} />
+<script type="application/json" id="tts-langs" set:html={JSON.stringify(languages)} />
+
+<script>
+	import { currentPageLanguage, setPageLanguage } from "../lib/i18n";
+	import type { Language } from "../lib/i18n";
+
+	const widget = document.querySelector<HTMLElement>("[data-tts-widget]");
+	const toggleBtn = document.getElementById("tts-toggle") as HTMLButtonElement | null;
+	const stopBtn = document.getElementById("tts-stop") as HTMLButtonElement | null;
+	const rateSelect = document.getElementById("tts-rate") as HTMLSelectElement | null;
+	const langSelect = document.getElementById("tts-lang") as HTMLSelectElement | null;
+	const playIcon = widget?.querySelector('[data-tts-icon="play"]');
+	const pauseIcon = widget?.querySelector('[data-tts-icon="pause"]');
+	const label = widget?.querySelector("[data-tts-label]");
+	const textDataEl = document.getElementById("tts-text");
+	const langsDataEl = document.getElementById("tts-langs");
+
+	if (!("speechSynthesis" in window) || !toggleBtn || !stopBtn || !textDataEl) {
+		if (toggleBtn) {
+			toggleBtn.disabled = true;
+			toggleBtn.title = "Listen isn't supported in this browser";
+		}
+	} else {
+		const text = JSON.parse(textDataEl.textContent || '""') as string;
+		const langs = JSON.parse(langsDataEl?.textContent || "[]") as Language[];
+
+		interface Chunk {
+			text: string;
+			/** Silence to insert after this chunk finishes speaking, in ms. */
+			pauseMs: number;
+		}
+
+		// Keep utterances fairly long (whole paragraphs where possible) — chaining
+		// many tiny per-sentence utterances introduces an audible click/pop at
+		// every boundary, which is what made playback sound noisy/distorted.
+		// We only split a paragraph once it gets long enough to risk engines
+		// cutting long utterances off.
+		const MAX_CHUNK_CHARS = 220;
+		const SENTENCE_PAUSE_MS = 150;
+		const PARAGRAPH_PAUSE_MS = 550;
+
+		// Voice name substrings that tend to sound clearer/more natural than a
+		// platform's generic default voice for a given language.
+		const PREFERRED_VOICE_HINTS = ["Google", "Natural", "Online", "Neural", "Premium"];
+
+		// Sentence-terminating punctuation across scripts: ASCII . ! ? and
+		// ellipsis, the Devanagari/Brahmic danda used by Hindi/Marathi/Bengali
+		// (। ॥), CJK full-width stops (。！？), and Arabic/Urdu marks (، ۔ ؟).
+		// Without these, a whole Hindi (etc.) paragraph reads as a single
+		// "sentence" with no split points — exactly the long-utterance case
+		// that Chrome's speech engine tends to garble or cut off.
+		const SENTENCE_TERMINATORS = ".!?…।॥。！？۔؟";
+		const SENTENCE_REGEX = new RegExp(
+			`[^${SENTENCE_TERMINATORS}]+[${SENTENCE_TERMINATORS}]+(?:\\s+|$)|[^${SENTENCE_TERMINATORS}]+$`,
+			"g",
+		);
+
+		let queue: Chunk[] = [];
+		let queueIndex = 0;
+		let pauseTimer: ReturnType<typeof window.setTimeout> | null = null;
+		let playState: "idle" | "loading" | "playing" | "paused" = "idle";
+		// The language actually used for the current playback session. May fall
+		// back to English mid-selection if the page hasn't finished translating
+		// yet, so we never read untranslated English text with a foreign voice.
+		let activeLangCode = "en";
+
+		if (langSelect) {
+			langSelect.value = currentPageLanguage();
+		}
+
+		const setIdle = () => {
+			toggleBtn.disabled = false;
+			playIcon?.classList.remove("hidden");
+			pauseIcon?.classList.add("hidden");
+			stopBtn.classList.add("hidden");
+			if (label) label.textContent = "Listen to this article";
+		};
+		const setLoading = () => {
+			toggleBtn.disabled = true;
+			stopBtn.classList.remove("hidden");
+			if (label) label.textContent = "Preparing audio…";
+		};
+		const setPlaying = () => {
+			toggleBtn.disabled = false;
+			playIcon?.classList.add("hidden");
+			pauseIcon?.classList.remove("hidden");
+			stopBtn.classList.remove("hidden");
+			if (label) label.textContent = "Pause";
+		};
+		const setPaused = () => {
+			playIcon?.classList.remove("hidden");
+			pauseIcon?.classList.add("hidden");
+			if (label) label.textContent = "Resume";
+		};
+
+		const speechLangFor = (code: string) => langs.find((l) => l.code === code)?.speechLang ?? "en-US";
+
+		const pickVoice = (speechLang: string) => {
+			const voices = window.speechSynthesis.getVoices();
+			const base = speechLang.split("-")[0];
+			const candidates = voices.filter((v) => v.lang === speechLang || v.lang.startsWith(base));
+			if (candidates.length === 0) return null;
+			const preferred = candidates.find((v) => PREFERRED_VOICE_HINTS.some((hint) => v.name.includes(hint)));
+			return preferred ?? candidates.find((v) => v.lang === speechLang) ?? candidates[0];
+		};
+
+		// Chrome (and others) can report an empty voice list for a moment after
+		// load. Give it a beat to populate so the first playback doesn't fall
+		// back to a low-quality default voice while the real list is still
+		// loading.
+		const ensureVoicesReady = () =>
+			new Promise<void>((resolve) => {
+				if (window.speechSynthesis.getVoices().length > 0) {
+					resolve();
+					return;
+				}
+				const onVoicesChanged = () => {
+					window.speechSynthesis.removeEventListener("voiceschanged", onVoicesChanged);
+					resolve();
+				};
+				window.speechSynthesis.addEventListener("voiceschanged", onVoicesChanged);
+				window.setTimeout(() => {
+					window.speechSynthesis.removeEventListener("voiceschanged", onVoicesChanged);
+					resolve();
+				}, 1000);
+			});
+
+		// Google Translate adds this class to <html> once it has actually
+		// rewritten the page's text. We need to wait for it before reading a
+		// non-English selection — otherwise we'd speak the still-English DOM
+		// text through a foreign-language voice, which sounds badly garbled.
+		const isPageTranslated = () => {
+			const root = document.documentElement.classList;
+			return root.contains("translated-ltr") || root.contains("translated-rtl");
+		};
+
+		const waitForTranslation = async (langCode: string) => {
+			if (langCode === "en") return;
+			const timeoutMs = 6000;
+			const start = Date.now();
+			while (!isPageTranslated() && Date.now() - start < timeoutMs) {
+				if (playState !== "loading") return; // cancelled while waiting
+				await new Promise((resolve) => window.setTimeout(resolve, 150));
+			}
+		};
+
+		// Splits into paragraphs, then packs consecutive sentences up to
+		// MAX_CHUNK_CHARS into a single utterance (splitting further only when a
+		// paragraph runs long). Fewer, longer utterances means fewer audible
+		// start/stop clicks, while the pause between groups still gives the
+		// reading proper phrasing.
+		const buildQueue = (raw: string): Chunk[] => {
+			const paragraphs = raw
+				.split(/\n+/)
+				.map((p) => p.replace(/\s+/g, " ").trim())
+				.filter(Boolean);
+
+			const chunks: Chunk[] = [];
+			for (const paragraph of paragraphs) {
+				const sentences = (paragraph.match(SENTENCE_REGEX) ?? [paragraph])
+					.map((s) => s.trim())
+					.filter(Boolean);
+
+				const groups: string[] = [];
+				let current = "";
+				for (const sentence of sentences) {
+					const candidate = current ? `${current} ${sentence}` : sentence;
+					if (current && candidate.length > MAX_CHUNK_CHARS) {
+						groups.push(current);
+						current = sentence;
+					} else {
+						current = candidate;
+					}
+				}
+				if (current) groups.push(current);
+
+				groups.forEach((group, i) => {
+					const isLastInParagraph = i === groups.length - 1;
+					chunks.push({ text: group, pauseMs: isLastInParagraph ? PARAGRAPH_PAUSE_MS : SENTENCE_PAUSE_MS });
+				});
+			}
+			return chunks;
+		};
+
+		// Google Translate rewrites the article's text nodes in place, so reading
+		// the live DOM (rather than the original `text` prop) picks up whichever
+		// language the page is currently translated into.
+		const spokenText = () => {
+			const articleBody = document.getElementById("article-body");
+			return articleBody?.innerText.trim() || text;
+		};
+
+		const clearPauseTimer = () => {
+			if (pauseTimer !== null) {
+				window.clearTimeout(pauseTimer);
+				pauseTimer = null;
+			}
+		};
+
+		const speakNext = () => {
+			// If we've been paused or stopped since this call was scheduled, the
+			// pause/stop handlers already own the state — do nothing here.
+			if (playState !== "playing") return;
+			if (queueIndex >= queue.length) {
+				playState = "idle";
+				setIdle();
+				return;
+			}
+			const chunk = queue[queueIndex];
+			const speechLang = speechLangFor(activeLangCode);
+			const utterance = new SpeechSynthesisUtterance(chunk.text);
+			utterance.lang = speechLang;
+			const voice = pickVoice(speechLang);
+			if (voice) utterance.voice = voice;
+			utterance.rate = parseFloat(rateSelect?.value ?? "1");
+			utterance.volume = 1;
+			utterance.pitch = 1;
+			const advance = () => {
+				if (playState !== "playing") return;
+				queueIndex += 1;
+				pauseTimer = window.setTimeout(speakNext, chunk.pauseMs);
+			};
+			utterance.onend = advance;
+			utterance.onerror = advance;
+			window.speechSynthesis.speak(utterance);
+		};
+
+		const startPlayback = async () => {
+			window.speechSynthesis.cancel();
+			clearPauseTimer();
+			playState = "loading";
+			setLoading();
+
+			const requestedLangCode = langSelect?.value ?? "en";
+			await ensureVoicesReady();
+			await waitForTranslation(requestedLangCode);
+			if (playState !== "loading") return; // stopped while we were waiting
+
+			// If the requested language never finished translating, read the
+			// (still English) text with an English voice rather than forcing a
+			// mismatched foreign voice onto it.
+			activeLangCode = requestedLangCode === "en" || isPageTranslated() ? requestedLangCode : "en";
+
+			queue = buildQueue(spokenText());
+			queueIndex = 0;
+			playState = "playing";
+			setPlaying();
+			speakNext();
+		};
+
+		const stopPlayback = () => {
+			playState = "idle";
+			clearPauseTimer();
+			window.speechSynthesis.cancel();
+			setIdle();
+		};
+
+		toggleBtn.addEventListener("click", () => {
+			if (playState === "idle") {
+				void startPlayback();
+			} else if (playState === "paused") {
+				playState = "playing";
+				setPlaying();
+				// If we paused mid-utterance, resume it; if we paused during the
+				// gap between sentences, there's nothing for the engine to resume
+				// so just continue the queue ourselves.
+				if (window.speechSynthesis.paused) {
+					window.speechSynthesis.resume();
+				} else {
+					speakNext();
+				}
+			} else {
+				playState = "paused";
+				clearPauseTimer();
+				window.speechSynthesis.pause();
+				setPaused();
+			}
+		});
+
+		stopBtn.addEventListener("click", stopPlayback);
+
+		langSelect?.addEventListener("change", () => {
+			stopPlayback();
+			if (langSelect.value !== currentPageLanguage()) {
+				// Reloads the page with the Google Translate cookie set, so the
+				// article text is actually translated before it's read aloud.
+				setPageLanguage(langSelect.value);
+			}
+		});
+
+		window.addEventListener("beforeunload", stopPlayback);
+	}
+</script>

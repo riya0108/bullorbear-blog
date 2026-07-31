@@ -1,0 +1,69 @@
+---
+const repo = import.meta.env.PUBLIC_GISCUS_REPO;
+const repoId = import.meta.env.PUBLIC_GISCUS_REPO_ID;
+const category = import.meta.env.PUBLIC_GISCUS_CATEGORY;
+const categoryId = import.meta.env.PUBLIC_GISCUS_CATEGORY_ID;
+
+const isConfigured = Boolean(repo && repoId && category && categoryId);
+---
+
+<section class="mx-auto max-w-3xl px-4 py-12 sm:px-0" aria-labelledby="comments-heading">
+	<h2 id="comments-heading" class="mb-6 text-xl font-extrabold text-ink">Discussion</h2>
+	{
+		isConfigured ? (
+			<div id="giscus-container" data-giscus />
+		) : (
+			<div class="rounded-2xl bg-surface-card p-6 text-sm text-mute">
+				Comments aren't connected yet. Add your{" "}
+				<code class="rounded bg-secondary-bg px-1.5 py-0.5 text-xs">PUBLIC_GISCUS_*</code>{" "}
+				values (from{" "}
+				<a href="https://giscus.app" class="font-semibold text-ink underline" target="_blank" rel="noopener noreferrer">
+					giscus.app
+				</a>
+				) to turn on threaded, GitHub-backed discussion here.
+			</div>
+		)
+	}
+</section>
+
+{
+	isConfigured && (
+		<script
+			is:inline
+			src="https://giscus.app/client.js"
+			data-repo={repo}
+			data-repo-id={repoId}
+			data-category={category}
+			data-category-id={categoryId}
+			data-mapping="pathname"
+			data-strict="0"
+			data-reactions-enabled="1"
+			data-emit-metadata="0"
+			data-input-position="bottom"
+			data-theme="preferred_color_scheme"
+			data-lang="en"
+			crossorigin="anonymous"
+			async
+		/>
+	)
+}
+
+<script>
+	function currentGiscusTheme() {
+		return document.documentElement.classList.contains("dark") ? "dark" : "light";
+	}
+
+	function sendTheme() {
+		const iframe = document.querySelector<HTMLIFrameElement>("iframe.giscus-frame");
+		iframe?.contentWindow?.postMessage(
+			{ giscus: { setConfig: { theme: currentGiscusTheme() } } },
+			"https://giscus.app",
+		);
+	}
+
+	const observer = new MutationObserver(sendTheme);
+	observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+	window.addEventListener("message", (event) => {
+		if (event.origin === "https://giscus.app" && event.data?.giscus) sendTheme();
+	});
+</script>

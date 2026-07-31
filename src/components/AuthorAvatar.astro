@@ -1,0 +1,27 @@
+---
+import { hashSeed } from "../lib/categoryHex";
+
+export interface Props {
+	name: string;
+	class?: string;
+}
+
+const { name, class: className = "" } = Astro.props;
+const initials = name
+	.split(" ")
+	.map((part) => part[0])
+	.slice(0, 2)
+	.join("")
+	.toUpperCase();
+
+const hues = ["#7e238b", "#3b5bdb", "#16a34a", "#0f766e", "#b45309", "#be185d"];
+const hue = hues[hashSeed(name) % hues.length];
+---
+
+<span
+	class={`grid shrink-0 place-items-center rounded-full text-xs font-bold text-white ${className}`}
+	style={`background-color: ${hue}`}
+	aria-hidden="true"
+>
+	{initials}
+</span>

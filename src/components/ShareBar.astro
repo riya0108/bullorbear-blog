@@ -1,0 +1,119 @@
+---
+import Icon from "./icons/Icon.astro";
+
+export interface Props {
+	title: string;
+	url: string;
+}
+
+const { title, url } = Astro.props;
+
+const intents = [
+	{
+		name: "X",
+		icon: "x-social",
+		href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`,
+	},
+	{
+		name: "Facebook",
+		icon: "facebook",
+		href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+	},
+	{
+		name: "WhatsApp",
+		icon: "message-circle",
+		href: `https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}`,
+	},
+	{
+		name: "Email",
+		icon: "mail",
+		href: `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`,
+	},
+];
+---
+
+<div class="relative inline-block" data-share-bar data-share-title={title} data-share-url={url}>
+	<button
+		type="button"
+		data-share-toggle
+		aria-haspopup="true"
+		aria-expanded="false"
+		class="flex h-10 items-center gap-1.5 rounded-full bg-surface-card px-4 text-sm font-bold text-ink hover:bg-secondary-bg"
+	>
+		<Icon name="share" class="h-4 w-4" />
+		Share
+	</button>
+
+	<div
+		data-share-menu
+		class="absolute left-0 top-[calc(100%+0.5rem)] z-30 hidden w-56 flex-col gap-1 rounded-2xl border border-hairline bg-canvas p-2 shadow-[0_16px_48px_rgba(0,0,0,0.12)]"
+	>
+		{
+			intents.map((i) => (
+				<a
+					href={i.href}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-ink hover:bg-surface-card"
+				>
+					<Icon name={i.icon} class="h-4.5 w-4.5" />
+					{i.name}
+				</a>
+			))
+		}
+		<button
+			type="button"
+			data-copy-link
+			class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-ink hover:bg-surface-card"
+		>
+			<Icon name="link" class="h-4.5 w-4.5" />
+			Copy link
+		</button>
+	</div>
+
+	<span data-copy-toast class="ml-2 hidden text-xs font-bold text-bull">Link copied!</span>
+</div>
+
+<script>
+	const bars = document.querySelectorAll<HTMLElement>("[data-share-bar]");
+	bars.forEach((bar) => {
+		const title = bar.dataset.shareTitle ?? "";
+		const url = bar.dataset.shareUrl ?? window.location.href;
+		const toggleBtn = bar.querySelector<HTMLButtonElement>("[data-share-toggle]");
+		const menu = bar.querySelector<HTMLElement>("[data-share-menu]");
+		const copyBtn = bar.querySelector<HTMLButtonElement>("[data-copy-link]");
+		const toast = bar.querySelector<HTMLElement>("[data-copy-toast]");
+
+		const closeMenu = () => {
+			menu?.classList.add("hidden");
+			toggleBtn?.setAttribute("aria-expanded", "false");
+		};
+
+		toggleBtn?.addEventListener("click", () => {
+			if (navigator.share) {
+				navigator.share({ title, url }).catch(() => {});
+				return;
+			}
+			const isHidden = menu?.classList.toggle("hidden");
+			toggleBtn.setAttribute("aria-expanded", String(!isHidden));
+		});
+
+		document.addEventListener("click", (e) => {
+			if (!bar.contains(e.target as Node)) closeMenu();
+		});
+		document.addEventListener("keydown", (e) => {
+			if (e.key === "Escape") closeMenu();
+		});
+
+		copyBtn?.addEventListener("click", async () => {
+			try {
+				await navigator.clipboard.writeText(url);
+				toast?.classList.remove("hidden");
+				setTimeout(() => toast?.classList.add("hidden"), 2000);
+			} catch {
+				window.prompt("Copy this link:", url);
+			}
+			closeMenu();
+		});
+	});
+</script>

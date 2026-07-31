@@ -1,0 +1,88 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { siteConfig } from "../../lib/siteConfig";
+
+const updated = "March 26, 2026";
+---
+
+<Layout title="Terms and Conditions" description={`Terms and conditions for ${siteConfig.name}.`} noIndex>
+	<section class="mx-auto max-w-3xl px-5 py-16 sm:px-6 sm:py-20">
+		<h1 class="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">Terms and Conditions</h1>
+		<p class="mt-2 text-sm text-mute">Last updated {updated}</p>
+		<div class="prose prose-neutral mt-8 max-w-none prose-headings:font-extrabold prose-headings:text-ink prose-p:text-body prose-li:text-body dark:prose-invert">
+			<p>
+				Welcome to {siteConfig.name}! By accessing and using our website, you agree to comply with
+				and be bound by the following Terms and Conditions. If you do not agree with any part of
+				these terms, please do not use our website.
+			</p>
+			<h2>Use of website</h2>
+			<p>
+				The content provided on {siteConfig.name} is for informational and educational purposes
+				only. By using this website, you agree to:
+			</p>
+			<ul>
+				<li>Not use the website for any illegal or unauthorised purpose</li>
+				<li>Not attempt to harm, hack, or disrupt the website</li>
+				<li>Use the content responsibly and ethically</li>
+			</ul>
+			<h2>Financial disclaimer</h2>
+			<p>
+				All content related to stocks, cryptocurrency, forex, credit cards, and investments is for
+				educational purposes only. We do not provide financial, investment, or trading advice. You
+				are solely responsible for your financial decisions, and we recommend consulting a
+				certified financial advisor before making any investments.
+			</p>
+			<h2>Accuracy of information</h2>
+			<p>
+				While we strive to provide accurate and up-to-date information, {siteConfig.name} makes no
+				guarantees regarding the completeness, reliability, or accuracy of the content. Any action
+				you take based on the information on this website is strictly at your own risk.
+			</p>
+			<h2>External links</h2>
+			<p>
+				Our website may contain links to external websites. We do not control or guarantee the
+				content, accuracy, or reliability of these third-party websites and are not responsible for
+				any losses or damages caused by them.
+			</p>
+			<h2>Affiliate disclosure</h2>
+			<p>
+				Some links on this website may be affiliate links. This means we may earn a small
+				commission if you click on the link and make a purchase, at no extra cost to you. We only
+				promote products and services that we believe provide value.
+			</p>
+			<h2>Intellectual property rights</h2>
+			<p>
+				All content on {siteConfig.name}, including text, graphics, logos, and images, is the
+				property of the website unless otherwise stated. You may not copy, reproduce, or distribute
+				content without permission, or use our content for commercial purposes without
+				authorisation.
+			</p>
+			<h2>Limitation of liability</h2>
+			<p>{siteConfig.name} will not be held liable for:</p>
+			<ul>
+				<li>Any financial losses or damages</li>
+				<li>Errors or omissions in content</li>
+				<li>Website downtime or technical issues</li>
+			</ul>
+			<p>Your use of the website is at your own risk.</p>
+			<h2>User-generated content</h2>
+			<p>If you post comments or content on our website:</p>
+			<ul>
+				<li>You are responsible for what you post</li>
+				<li>Content must not be offensive, illegal, or harmful</li>
+				<li>We reserve the right to remove any content at our discretion</li>
+			</ul>
+			<h2>Changes to terms</h2>
+			<p>We may update these Terms and Conditions at any time. Any changes will be posted on this page with an updated date.</p>
+			<h2>Termination of access</h2>
+			<p>We reserve the right to restrict or terminate access to our website if users violate these terms.</p>
+			<h2>Contact</h2>
+			<p>
+				Questions about these terms? Email us at
+				<a href="mailto:bullorbearstrategies@gmail.com" class="font-semibold text-primary"
+					>bullorbearstrategies@gmail.com</a
+				> or <a href="/contact/" class="font-semibold text-primary">contact us</a>.
+			</p>
+		</div>
+	</section>
+</Layout>

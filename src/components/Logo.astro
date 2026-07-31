@@ -1,0 +1,18 @@
+---
+export interface Props {
+	class?: string;
+}
+const { class: className = "" } = Astro.props;
+---
+
+<a href="/" class={`flex shrink-0 items-center gap-2.5 ${className}`} aria-label="Bull or Bear Blogs, home">
+	<span class="relative block h-9 w-9 shrink-0 overflow-hidden rounded-full">
+		<img src="/favicon-96x96.png" alt="" class="h-full w-full object-cover" width="96" height="96" />
+	</span>
+	<span class="flex flex-col leading-none">
+		<span class="text-base font-extrabold uppercase tracking-tight text-ink">
+			Bull <span class="text-primary">or</span> Bear
+		</span>
+		<span class="text-[10px] font-bold uppercase tracking-[0.2em] text-mute">Blogs</span>
+	</span>
+</a>

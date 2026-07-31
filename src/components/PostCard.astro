@@ -1,0 +1,61 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getEntry } from "astro:content";
+import Thumbnail from "./Thumbnail.astro";
+import Icon from "./icons/Icon.astro";
+import { dotClass, textClass } from "../lib/categoryStyles";
+import { readingTime } from "../lib/readingTime";
+
+export interface Props {
+	post: CollectionEntry<"posts">;
+	featured?: boolean;
+	delay?: number;
+}
+
+const { post, featured = false, delay = 0 } = Astro.props;
+const category = await getEntry(post.data.category);
+const time = readingTime(post.body);
+const dateLabel = post.data.pubDate.toLocaleDateString("en-IN", {
+	month: "short",
+	day: "numeric",
+	year: "numeric",
+});
+---
+
+<a
+	href={`/${category?.data.slug}/${post.id}/`}
+	data-reveal-delay={delay}
+	class={`reveal group block overflow-hidden rounded-2xl bg-surface-card transition-transform duration-300 hover:-translate-y-1 ${featured ? "sm:col-span-2 sm:row-span-2" : ""}`}
+>
+	<Thumbnail
+		slug={post.id}
+		accentColor={category?.data.accentColor ?? "cat-tech"}
+		src={post.data.heroImage}
+		alt={post.data.heroImageAlt}
+	/>
+	<div class="space-y-2.5 p-4">
+		<span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide">
+			<span class={`h-2 w-2 rounded-full ${dotClass(category?.data.accentColor ?? "")}`}></span>
+			<span class={textClass(category?.data.accentColor ?? "")}>{category?.data.name}</span>
+		</span>
+		<h3
+			class={`font-bold text-ink transition-colors group-hover:text-primary ${featured ? "text-xl sm:text-2xl" : "text-base"}`}
+		>
+			{post.data.title}
+		</h3>
+		<p class="line-clamp-2 text-sm text-mute">{post.data.description}</p>
+		<div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 text-xs text-mute">
+			<span class="font-semibold text-charcoal">{post.data.author.name}</span>
+			<span aria-hidden="true">·</span>
+			<time datetime={post.data.pubDate.toISOString()}>{dateLabel}</time>
+			<span aria-hidden="true">·</span>
+			<span class="inline-flex items-center gap-1">
+				<Icon name="clock" class="h-3.5 w-3.5" />
+				{time.label}
+			</span>
+			<span class="inline-flex items-center gap-1" aria-hidden="true">
+				<Icon name="headphones" class="h-3.5 w-3.5" />
+			</span>
+		</div>
+	</div>
+</a>

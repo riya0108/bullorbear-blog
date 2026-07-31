@@ -1,0 +1,59 @@
+---
+import { categoryHex, hashSeed, seededRandom } from "../lib/categoryHex";
+
+export interface Props {
+	slug: string;
+	accentColor: string;
+	class?: string;
+	src?: string;
+	alt?: string;
+	loading?: "lazy" | "eager";
+}
+
+const { slug, accentColor, class: className = "", src, alt = "", loading = "lazy" } = Astro.props;
+const hex = categoryHex[accentColor] ?? "#62625b";
+const seed = hashSeed(slug);
+const r = (i: number, min: number, max: number) => min + seededRandom(seed, i) * (max - min);
+
+const gradId = `thumb-grad-${slug}`;
+const circles = [
+	{ cx: r(1, 40, 140), cy: r(2, 30, 110), radius: r(3, 60, 110) },
+	{ cx: r(4, 220, 380), cy: r(5, 120, 220), radius: r(6, 70, 130) },
+	{ cx: r(7, 260, 360), cy: r(8, 10, 70), radius: r(9, 30, 60) },
+];
+const rotation = r(10, -18, 18);
+---
+
+<div class={`relative aspect-video w-full overflow-hidden bg-surface-card ${className}`}>
+	{
+		src ? (
+			<img src={src} alt={alt} loading={loading} decoding="async" class="h-full w-full object-contain" />
+		) : (
+			<svg viewBox="0 0 400 250" class="h-full w-full" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+				<defs>
+					<linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
+						<stop offset="0%" stop-color={hex} stop-opacity="0.16" />
+						<stop offset="100%" stop-color={hex} stop-opacity="0.05" />
+					</linearGradient>
+				</defs>
+				<rect width="400" height="250" fill={`url(#${gradId})`} />
+				<g transform={`rotate(${rotation.toFixed(1)} 200 125)`}>
+					{circles.map((c) => (
+						<circle cx={c.cx} cy={c.cy} r={c.radius} fill={hex} fill-opacity="0.14" />
+					))}
+					{circles.map((c) => (
+						<circle
+							cx={c.cx}
+							cy={c.cy}
+							r={c.radius}
+							fill="none"
+							stroke={hex}
+							stroke-opacity="0.35"
+							stroke-width="1.5"
+						/>
+					))}
+				</g>
+			</svg>
+		)
+	}
+</div>
