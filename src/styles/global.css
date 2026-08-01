@@ -258,14 +258,29 @@ body {
 	animation-delay: -8s;
 }
 
+/* Faint dot-grid texture, always present at very low opacity. */
+.bg-ambient__grid {
+	position: absolute;
+	inset: 0;
+	background-image: radial-gradient(var(--color-stone) 1px, transparent 1px);
+	background-size: 28px 28px;
+	opacity: 0.35;
+}
+
+/* Same dot-grid, drawn brighter, revealed only inside a circle that
+   follows the cursor — a flashlight-over-a-grid effect. Position is
+   updated every pointermove by src/scripts/ambient.ts. */
 .bg-ambient__spotlight {
 	position: absolute;
 	inset: 0;
-	background: radial-gradient(
-		480px circle at var(--mx, 50%) var(--my, 30%),
-		var(--color-surface-card) 0%,
-		transparent 72%
+	background-image: radial-gradient(var(--color-ink) 1.5px, transparent 1.5px);
+	background-size: 28px 28px;
+	-webkit-mask-image: radial-gradient(
+		220px circle at var(--mx, 50%) var(--my, 30%),
+		black 0%,
+		transparent 75%
 	);
+	mask-image: radial-gradient(220px circle at var(--mx, 50%) var(--my, 30%), black 0%, transparent 75%);
 	opacity: var(--spotlight-opacity, 0);
 	transition: opacity 0.4s ease;
 }
