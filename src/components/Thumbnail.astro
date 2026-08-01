@@ -24,7 +24,7 @@ const circles = [
 const rotation = r(10, -18, 18);
 ---
 
-<div class={`relative aspect-video w-full overflow-hidden bg-surface-card ${className}`}>
+<div class={`thumb-holo relative aspect-video w-full overflow-hidden bg-surface-card ${className}`}>
 	{
 		src ? (
 			<img src={src} alt={alt} loading={loading} decoding="async" class="h-full w-full object-contain" />
@@ -57,3 +57,37 @@ const rotation = r(10, -18, 18);
 		)
 	}
 </div>
+
+<style>
+	/* Holographic sheen sweep, triggered whenever the ancestor card link is
+	   hovered/focused — inspired by https://codepen.io/nefejames/pen/ogvNgJq.
+	   Scoped to the image only; the card's text content is untouched. */
+	.thumb-holo::before {
+		content: "";
+		position: absolute;
+		top: -50%;
+		left: -50%;
+		width: 200%;
+		height: 200%;
+		z-index: 1;
+		pointer-events: none;
+		background: linear-gradient(0deg, transparent, transparent 30%, rgba(255, 255, 255, 0.35));
+		transform: rotate(-45deg);
+		opacity: 0;
+		transition:
+			opacity 0.5s ease,
+			transform 0.5s ease;
+	}
+
+	:global(a):hover .thumb-holo::before,
+	:global(a):focus-visible .thumb-holo::before {
+		opacity: 1;
+		transform: rotate(-45deg) translateY(100%);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.thumb-holo::before {
+			transition: none;
+		}
+	}
+</style>

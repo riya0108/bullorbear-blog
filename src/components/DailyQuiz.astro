@@ -1,0 +1,418 @@
+---
+import { quizPool } from "../data/quiz";
+---
+
+<section class="mx-auto max-w-[1600px] px-5 py-10 sm:px-6 sm:py-14 lg:px-10 xl:px-16" aria-labelledby="quiz-heading">
+	<div class="reveal grid gap-10 rounded-[2rem] bg-surface-card p-6 sm:p-10 lg:grid-cols-2 lg:items-center lg:gap-16 lg:p-14">
+		<div>
+			<p class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-mute">
+				<span class="h-2 w-2 rounded-full bg-primary"></span>
+				New question, every day
+			</p>
+			<h2 id="quiz-heading" class="mt-1 text-2xl font-extrabold text-ink sm:text-3xl">Daily Quiz</h2>
+			<p class="mt-2 max-w-md text-sm text-mute">
+				One quick, thought-worthy question a day across AI, money, politics, and everything
+				between. Take your best guess before you scroll on.
+			</p>
+
+			<div class="mt-8">
+				<span id="quizTopic" class="inline-flex items-center rounded-full bg-canvas px-3 py-1 text-xs font-bold uppercase tracking-wide text-ink">&nbsp;</span>
+				<p id="quizQuestion" class="mt-4 min-h-[3.5rem] text-lg font-bold leading-snug text-ink sm:text-xl">&nbsp;</p>
+
+				<div id="quizOptions" class="mt-5 grid gap-2.5" role="radiogroup" aria-label="Answer options"></div>
+
+				<div class="mt-5 flex flex-wrap items-center gap-4">
+					<button
+						type="button"
+						id="quizSubmit"
+						disabled
+						class="inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-bold text-white transition-opacity disabled:opacity-40"
+					>
+						Submit answer
+					</button>
+					<p id="quizResult" class="hidden text-sm font-bold"></p>
+				</div>
+				<p id="quizExplanation" class="mt-3 hidden text-sm text-mute"></p>
+			</div>
+		</div>
+
+		<div class="relative mx-auto w-full max-w-[380px]">
+			<div class="quiz-hover-hint" aria-hidden="true">
+				<span class="quiz-hover-hint__label">Hover me</span>
+				<svg class="quiz-hover-hint__arrow" viewBox="0 0 40 40" fill="none">
+					<path
+						d="M4 4 C 6 18, 16 28, 34 32"
+						stroke="currentColor"
+						stroke-width="2.5"
+						stroke-linecap="round"
+						stroke-dasharray="1 6"
+					/>
+					<path
+						d="M27 26.5 L34 32 L25 34"
+						stroke="currentColor"
+						stroke-width="2.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						fill="none"
+					/>
+				</svg>
+			</div>
+
+			<div class="quiz-cubes-panel relative flex aspect-square w-full items-center justify-center" aria-hidden="true">
+				<div class="quiz-cube-scene">
+					<div class="quiz-cube-rig">
+						{
+							[0, 1, 2].map((cluster) => (
+								<div class={`quiz-cube-cluster quiz-cube-cluster--${cluster}`}>
+									{[-1, 0, 1].map((x) => (
+										<div class="quiz-cube-column" style={`--x:${x};`}>
+											{[3, 2, 1].map((i) => (
+												<span class="quiz-cube-block" style={`--i:${i};`} />
+											))}
+										</div>
+									))}
+								</div>
+							))
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script type="application/json" id="quiz-data" set:html={JSON.stringify(quizPool)} />
+
+<script>
+	import { textClass } from "../lib/categoryStyles";
+
+	interface QuizQuestion {
+		topic: string;
+		accentColor: string;
+		question: string;
+		options: string[];
+		correctIndex: number;
+		explanation: string;
+	}
+
+	function initDailyQuiz() {
+		const dataEl = document.getElementById("quiz-data");
+		const topicEl = document.getElementById("quizTopic");
+		const questionEl = document.getElementById("quizQuestion");
+		const optionsEl = document.getElementById("quizOptions");
+		const submitBtn = document.getElementById("quizSubmit") as HTMLButtonElement | null;
+		const resultEl = document.getElementById("quizResult");
+		const explanationEl = document.getElementById("quizExplanation");
+		if (!dataEl || !topicEl || !questionEl || !optionsEl || !submitBtn || !resultEl || !explanationEl) return;
+
+		const pool = JSON.parse(dataEl.textContent || "[]") as QuizQuestion[];
+		if (pool.length === 0) return;
+
+		// Same question for everyone on a given calendar day, rotating through
+		// the pool — no rebuild required for it to change tomorrow.
+		const now = new Date();
+		const startOfYear = new Date(now.getFullYear(), 0, 0);
+		const dayOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / 86400000);
+		const question = pool[dayOfYear % pool.length];
+		const storageKey = `bob-daily-quiz-${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+
+		topicEl.textContent = question.topic;
+		topicEl.className = `inline-flex items-center rounded-full bg-canvas px-3 py-1 text-xs font-bold uppercase tracking-wide ${textClass(question.accentColor)}`;
+		questionEl.textContent = question.question;
+
+		let selected: number | null = null;
+		let answered = false;
+
+		const optionButtons = question.options.map((label, i) => {
+			const btn = document.createElement("button");
+			btn.type = "button";
+			btn.setAttribute("role", "radio");
+			btn.setAttribute("aria-checked", "false");
+			btn.className =
+				"quiz-option flex w-full items-center gap-3 rounded-2xl border-2 border-hairline bg-canvas px-4 py-3 text-left text-sm font-semibold text-ink transition-colors";
+			const marker = document.createElement("span");
+			marker.className = "quiz-option__marker grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 border-hairline";
+			const text = document.createElement("span");
+			text.textContent = label;
+			btn.append(marker, text);
+			btn.addEventListener("click", () => {
+				if (answered) return;
+				selected = i;
+				optionButtons.forEach((b, j) => {
+					b.setAttribute("aria-checked", String(j === i));
+					b.classList.toggle("is-selected", j === i);
+				});
+				submitBtn.disabled = false;
+			});
+			optionsEl.appendChild(btn);
+			return btn;
+		});
+
+		function reveal(selectedIndex: number | null) {
+			answered = true;
+			optionButtons.forEach((b, i) => {
+				b.disabled = true;
+				const marker = b.querySelector(".quiz-option__marker");
+				if (i === question.correctIndex) {
+					b.classList.add("is-correct");
+					if (marker) marker.textContent = "✓";
+				} else if (i === selectedIndex) {
+					b.classList.add("is-wrong");
+					if (marker) marker.textContent = "✕";
+				}
+			});
+			submitBtn!.style.display = "none";
+			resultEl!.classList.remove("hidden");
+			if (selectedIndex === question.correctIndex) {
+				resultEl!.textContent = "Correct!";
+				resultEl!.classList.add("text-bull");
+			} else {
+				resultEl!.textContent = "Not quite.";
+				resultEl!.classList.add("text-bear");
+			}
+			explanationEl!.textContent = question.explanation;
+			explanationEl!.classList.remove("hidden");
+		}
+
+		submitBtn.addEventListener("click", () => {
+			if (selected === null || answered) return;
+			localStorage.setItem(storageKey, String(selected));
+			reveal(selected);
+		});
+
+		const stored = localStorage.getItem(storageKey);
+		if (stored !== null) {
+			const storedIndex = Number(stored);
+			optionButtons.forEach((b, i) => b.setAttribute("aria-checked", String(i === storedIndex)));
+			reveal(storedIndex);
+		}
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initDailyQuiz);
+	} else {
+		initDailyQuiz();
+	}
+</script>
+
+<style>
+	/* .quiz-option* elements are created client-side via document.createElement
+	   (see the inline <script> above), so they never receive Astro's
+	   scoped data-astro-cid attribute — these rules must stay :global()
+	   or they'd silently never match. */
+	:global(.quiz-option.is-selected) {
+		border-color: var(--color-ink);
+	}
+
+	:global(.quiz-option.is-selected .quiz-option__marker) {
+		border-color: var(--color-ink);
+		background: var(--color-ink);
+	}
+
+	:global(.quiz-option:disabled) {
+		cursor: default;
+	}
+
+	:global(.quiz-option.is-correct) {
+		border-color: var(--color-bull);
+		background: color-mix(in srgb, var(--color-bull) 14%, var(--color-canvas));
+	}
+
+	:global(.quiz-option.is-correct .quiz-option__marker) {
+		border-color: var(--color-bull);
+		background: var(--color-bull);
+		color: #fff;
+		font-size: 11px;
+		line-height: 1;
+	}
+
+	:global(.quiz-option.is-wrong) {
+		border-color: var(--color-bear);
+		background: color-mix(in srgb, var(--color-bear) 12%, var(--color-canvas));
+	}
+
+	:global(.quiz-option.is-wrong .quiz-option__marker) {
+		border-color: var(--color-bear);
+		background: var(--color-bear);
+		color: #fff;
+		font-size: 11px;
+		line-height: 1;
+	}
+
+	/* Isometric cube grid — recreated from Greg Vissing's "CSS Only Cubes
+	   Hover Effects" (https://codepen.io/gvissing/pen/QWBrzdB). No 3D
+	   transforms: each "cube" is one flat square plus two skewed
+	   pseudo-elements (left + top face), stacked in flex columns and
+	   offset into three diagonal clusters, then the whole scene is
+	   skewed for the isometric look. A slow whole-scene hue-rotate barely
+	   shows on the neutral resting cubes but sweeps the hover color
+	   through the spectrum while a cube is actively hovered. */
+	.quiz-cube-scene {
+		/* Real, explicit box (rather than the zero-size box the clusters'
+		   absolute-positioned content would otherwise collapse to) so
+		   flex centering on .quiz-cubes-panel centers the actual cube
+		   silhouette, not an arbitrary corner of it. Sized to the union
+		   of all cluster/column/face offsets below. */
+		position: relative;
+		width: 350px;
+		height: 370px;
+		transform: scale(0.62) skewY(-20deg);
+		animation: quiz-cube-hue 5s linear infinite;
+
+		/* Neutral grey in light mode (readable against the card without a
+		   boxed backdrop, without going near-black), off-white in dark
+		   mode — set explicitly per theme rather than derived, since a
+		   straight ink/canvas mix ran too dark in light mode. */
+		--cube-main: #a8a8a8;
+		--cube-top: #c4c4c4;
+		--cube-left: #d9d9d9;
+		--cube-hover: var(--color-primary);
+	}
+
+	:global(.dark) .quiz-cube-scene {
+		--cube-main: #dcdcdc;
+		--cube-top: #f0f0f0;
+		--cube-left: #ffffff;
+	}
+
+	.quiz-cube-rig {
+		/* Shifts the cluster content (whose bounding box is x:[-170,180]
+		   y:[-100,270] around its own shared origin) so it exactly fills
+		   .quiz-cube-scene's 350x370 box. */
+		position: absolute;
+		left: 170px;
+		top: 100px;
+	}
+
+	.quiz-cube-cluster {
+		position: relative;
+		z-index: 2;
+	}
+
+	.quiz-cube-cluster--0 {
+		translate: -60px -60px;
+		z-index: 1;
+	}
+
+	.quiz-cube-cluster--2 {
+		translate: 60px 60px;
+		z-index: 3;
+	}
+
+	.quiz-cube-column {
+		position: absolute;
+		top: 0;
+		left: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 30px;
+		translate: calc(-70px * var(--x)) 0px;
+	}
+
+	.quiz-cube-block {
+		position: relative;
+		display: inline-block;
+		width: 50px;
+		height: 50px;
+		background: var(--cube-main);
+		z-index: calc(1 * var(--i));
+		transition:
+			background 1.5s,
+			filter 1.5s;
+	}
+
+	.quiz-cube-block::before {
+		content: "";
+		position: absolute;
+		left: -40px;
+		width: 40px;
+		height: 100%;
+		background: var(--cube-left);
+		transform-origin: right center;
+		transform: skewY(45deg);
+		transition: background 1.5s;
+	}
+
+	.quiz-cube-block::after {
+		content: "";
+		position: absolute;
+		top: -40px;
+		left: 0;
+		width: 100%;
+		height: 40px;
+		background: var(--cube-top);
+		transform-origin: center bottom;
+		transform: skewX(45deg);
+		transition: background 1.5s;
+	}
+
+	.quiz-cube-block:hover {
+		background: var(--cube-hover);
+		filter: drop-shadow(0 0 30px var(--cube-hover));
+		transition: none;
+	}
+
+	.quiz-cube-block:hover::before,
+	.quiz-cube-block:hover::after {
+		background: var(--cube-hover);
+		transition: none;
+	}
+
+	@keyframes quiz-cube-hue {
+		0% {
+			filter: hue-rotate(0deg);
+		}
+		100% {
+			filter: hue-rotate(360deg);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.quiz-cube-scene {
+			animation: none;
+		}
+	}
+
+	/* "Hover me" prompt, tucked just outside the cube silhouette and
+	   pointing straight at it from the left. */
+	.quiz-hover-hint {
+		position: absolute;
+		top: 16%;
+		left: 20%;
+		z-index: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0;
+		color: var(--color-mute);
+		animation: quiz-hint-bob 2.4s ease-in-out infinite;
+	}
+
+	.quiz-hover-hint__label {
+		white-space: nowrap;
+		font-size: 0.75rem;
+		font-style: italic;
+		font-weight: 700;
+	}
+
+	.quiz-hover-hint__arrow {
+		width: 34px;
+		height: 34px;
+	}
+
+	@keyframes quiz-hint-bob {
+		0%,
+		100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(4px);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.quiz-hover-hint {
+			animation: none;
+		}
+	}
+</style>

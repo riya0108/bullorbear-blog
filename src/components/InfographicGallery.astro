@@ -1,114 +1,8 @@
 ---
 import Icon from "./icons/Icon.astro";
+import { infographics } from "../data/infographics";
 
-interface Infographic {
-	src: string;
-	alt: string;
-	caption: string;
-}
-
-const infographics: Infographic[] = [
-	{
-		src: "/images/infographics/frequency-of-crime-in-india.webp",
-		alt: "Frequency of crime in India visualized as an infographic",
-		caption: "Frequency of Crime in India",
-	},
-	{
-		src: "/images/infographics/top-10-best-performing-gold-etfs.webp",
-		alt: "Top 10 best performing gold ETFs infographic",
-		caption: "Top 10 Best Performing Gold ETFs",
-	},
-	{
-		src: "/images/infographics/most-reliable-brand.webp",
-		alt: "Most reliable brand infographic",
-		caption: "Most Reliable Brand?",
-	},
-	{
-		src: "/images/infographics/zomato-or-swiggy.webp",
-		alt: "Zomato or Swiggy comparison infographic",
-		caption: "Zomato or Swiggy?",
-	},
-	{
-		src: "/images/infographics/cost-of-living-per-day-in-indian-cities.webp",
-		alt: "Cost of living per day in different cities of India infographic",
-		caption: "Cost of Living per Day in Different Cities of India",
-	},
-	{
-		src: "/images/infographics/cost-of-living-2016-vs-2026.webp",
-		alt: "Cost of living in 2016 vs 2026 infographic",
-		caption: "Cost of Living: 2016 vs. 2026",
-	},
-	{
-		src: "/images/infographics/ai-is-thirstier-than-you-are.webp",
-		alt: "AI water consumption infographic",
-		caption: "AI Is Thirstier Than You Are for Your Answers",
-	},
-	{
-		src: "/images/infographics/best-mobile-network-in-india.webp",
-		alt: "Best mobile network in India infographic",
-		caption: "Best Mobile Network in India",
-	},
-	{
-		src: "/images/infographics/how-vijay-manages-his-wealth.webp",
-		alt: "How Vijay manages his wealth infographic",
-		caption: "How Vijay Manages His Wealth",
-	},
-	{
-		src: "/images/infographics/upi-market-share.webp",
-		alt: "UPI market share infographic",
-		caption: "UPI Market Share",
-	},
-	{
-		src: "/images/infographics/ipl-team-valuations.webp",
-		alt: "IPL team valuations infographic",
-		caption: "IPL Team Valuations",
-	},
-	{
-		src: "/images/infographics/top-5-mutual-funds.webp",
-		alt: "Top 5 mutual funds infographic",
-		caption: "Top 5 Mutual Funds",
-	},
-	{
-		src: "/images/infographics/1gb-internet-cost.webp",
-		alt: "Cost of 1 GB of internet across countries infographic",
-		caption: "1 GB Internet Cost",
-	},
-	{
-		src: "/images/infographics/alcohol-taxes-across-india.webp",
-		alt: "Alcohol taxes across India infographic",
-		caption: "Alcohol Taxes Across India",
-	},
-	{
-		src: "/images/infographics/millionaires-in-lok-sabha.webp",
-		alt: "Millionaires in Lok Sabha infographic",
-		caption: "Millionaires in Lok Sabha",
-	},
-	{
-		src: "/images/infographics/can-you-afford-these-cars.webp",
-		alt: "Can you afford these cars infographic",
-		caption: "Can You Afford These Cars?",
-	},
-	{
-		src: "/images/infographics/cost-of-a-pack-of-marlboro.webp",
-		alt: "Cost of a pack of Marlboro cigarettes infographic",
-		caption: "Cost of a Pack of Marlboro",
-	},
-	{
-		src: "/images/infographics/most-sold-cars-fy2026.webp",
-		alt: "Most sold cars of FY 2026 infographic",
-		caption: "Most Sold Cars of FY 2026",
-	},
-	{
-		src: "/images/infographics/india-slips-to-7th-largest-stock-market.webp",
-		alt: "India slips to 7th largest stock market infographic",
-		caption: "India Slips to the 7th-Largest Stock Market",
-	},
-	{
-		src: "/images/infographics/coming-up-next.webp",
-		alt: "Coming up next teaser infographic",
-		caption: "Coming Up Next",
-	},
-];
+const preview = infographics.slice(0, 8);
 ---
 
 <section
@@ -129,27 +23,81 @@ const infographics: Infographic[] = [
 				The week's biggest stories on money, markets, and India — broken down into one glance.
 			</p>
 		</div>
+		<a
+			href="/infographics/"
+			class="reveal inline-flex shrink-0 items-center gap-1.5 self-start rounded-full border border-ink/10 bg-surface-card px-4 py-2 text-sm font-bold text-ink hover:bg-secondary-bg sm:self-auto"
+			data-reveal-delay="100"
+		>
+			View all
+			<Icon name="chevron-down" class="h-4 w-4 -rotate-90" />
+		</a>
 	</div>
 
-	<div class="mt-6 columns-1 gap-3 sm:mt-8 sm:columns-2 sm:gap-5 lg:columns-3 xl:columns-4">
+	<div class="mx-auto mt-6 grid max-w-[880px] grid-cols-2 gap-4 sm:mt-8 sm:grid-cols-4 sm:gap-6">
 		{
-			infographics.map((info, i) => (
+			preview.map((info, i) => (
 				<figure
-					class="reveal mx-4 mb-3 break-inside-avoid overflow-hidden rounded-lg border border-ink/5 bg-surface-card shadow-sm sm:mx-0 sm:mb-5 sm:rounded-2xl"
+					class="reveal overflow-hidden rounded-lg border border-ink/5 bg-surface-card shadow-sm sm:rounded-xl"
 					data-reveal-delay={Math.min(i * 40, 320)}
 				>
 					<a href={info.src} target="_blank" rel="noopener noreferrer" class="group block">
-						<img
-							src={info.src}
-							alt={info.alt}
-							loading="lazy"
-							decoding="async"
-							class="block w-full h-auto transition-transform duration-300 group-hover:scale-[1.02]"
-						/>
+						<span class="holo-sheen relative block overflow-hidden">
+							<img
+								src={info.src}
+								alt={info.alt}
+								loading="lazy"
+								decoding="async"
+								class="block w-full h-auto transition-transform duration-300 group-hover:scale-[1.02]"
+							/>
+						</span>
 					</a>
-					<figcaption class="px-3 py-2 text-xs font-semibold text-ink sm:px-4 sm:py-3 sm:text-sm">{info.caption}</figcaption>
+					<figcaption class="px-2.5 py-2 text-xs font-semibold leading-snug text-ink sm:px-3 sm:py-2.5 sm:text-sm">{info.caption}</figcaption>
 				</figure>
 			))
 		}
 	</div>
+
+	<div class="mt-6 flex justify-center sm:mt-8">
+		<a
+			href="/infographics/"
+			class="reveal inline-flex items-center gap-1.5 rounded-full bg-ink px-5 py-2.5 text-sm font-bold text-canvas hover:opacity-90"
+		>
+			View all infographics
+			<Icon name="chevron-down" class="h-4 w-4 -rotate-90" />
+		</a>
+	</div>
 </section>
+
+<style>
+	/* Holographic sheen sweep on hover — inspired by
+	   https://codepen.io/nefejames/pen/ogvNgJq. Scoped to the image only;
+	   the caption below stays untouched. */
+	.holo-sheen::before {
+		content: "";
+		position: absolute;
+		top: -50%;
+		left: -50%;
+		width: 200%;
+		height: 200%;
+		z-index: 1;
+		pointer-events: none;
+		background: linear-gradient(0deg, transparent, transparent 30%, rgba(255, 255, 255, 0.35));
+		transform: rotate(-45deg);
+		opacity: 0;
+		transition:
+			opacity 0.5s ease,
+			transform 0.5s ease;
+	}
+
+	.group:hover .holo-sheen::before,
+	.group:focus-visible .holo-sheen::before {
+		opacity: 1;
+		transform: rotate(-45deg) translateY(100%);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.holo-sheen::before {
+			transition: none;
+		}
+	}
+</style>

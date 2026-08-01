@@ -38,7 +38,8 @@ const intents = [
 		data-share-toggle
 		aria-haspopup="true"
 		aria-expanded="false"
-		class="flex h-10 items-center gap-1.5 rounded-full bg-surface-card px-4 text-sm font-bold text-ink hover:bg-secondary-bg"
+		style="--i: #4f46e5; --j: #ec4899;"
+		class="gradient-btn flex h-10 items-center gap-1.5 rounded-full bg-surface-card px-4 text-sm font-bold text-ink"
 	>
 		<Icon name="share" class="h-4 w-4" />
 		Share
@@ -54,9 +55,14 @@ const intents = [
 					href={i.href}
 					target="_blank"
 					rel="noopener noreferrer"
-					class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-ink hover:bg-surface-card"
+					class="share-row flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-ink hover:bg-surface-card"
 				>
-					<Icon name={i.icon} class="h-4.5 w-4.5" />
+					<span
+						class="share-icon relative grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-surface-card"
+						data-social={i.icon}
+					>
+						<Icon name={i.icon} class="share-icon__glyph relative z-10 h-4 w-4" />
+					</span>
 					{i.name}
 				</a>
 			))
@@ -64,9 +70,11 @@ const intents = [
 		<button
 			type="button"
 			data-copy-link
-			class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-ink hover:bg-surface-card"
+			class="share-row flex items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-semibold text-ink hover:bg-surface-card"
 		>
-			<Icon name="link" class="h-4.5 w-4.5" />
+			<span class="share-icon relative grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-surface-card" data-social="link">
+				<Icon name="link" class="share-icon__glyph relative z-10 h-4 w-4" />
+			</span>
 			Copy link
 		</button>
 	</div>
@@ -117,3 +125,114 @@ const intents = [
 		});
 	});
 </script>
+
+<style>
+	/* Gradient reveal + soft glow on hover for the Share trigger — inspired
+	   by https://codepen.io/yxwang31/pen/NWYpdxx (see also ListenButton.astro). */
+	.gradient-btn {
+		position: relative;
+		z-index: 0;
+		transition: color 0.4s ease;
+	}
+
+	.gradient-btn::before,
+	.gradient-btn::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: 9999px;
+		background: linear-gradient(45deg, var(--i), var(--j));
+		opacity: 0;
+		transition: opacity 0.4s ease;
+	}
+
+	.gradient-btn::before {
+		z-index: -1;
+	}
+
+	.gradient-btn::after {
+		z-index: -2;
+		filter: blur(16px);
+	}
+
+	.gradient-btn:hover,
+	.gradient-btn:focus-visible {
+		color: #fff;
+	}
+
+	.gradient-btn:hover::before,
+	.gradient-btn:focus-visible::before {
+		opacity: 1;
+	}
+
+	.gradient-btn:hover::after,
+	.gradient-btn:focus-visible::after {
+		opacity: 0.6;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.gradient-btn::before,
+		.gradient-btn::after,
+		.gradient-btn {
+			transition: none;
+		}
+	}
+
+	/* Share icon hover — same wipe + flip treatment as the footer's social
+	   icons (see Footer.astro), triggered by the row's hover/focus state. */
+	.share-icon::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		top: 100%;
+		background: var(--social-color, var(--color-primary));
+		transition: top 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+	}
+
+	.share-row:hover .share-icon::before,
+	.share-row:focus-visible .share-icon::before {
+		top: 0;
+	}
+
+	.share-icon :global(.share-icon__glyph) {
+		transition:
+			transform 0.45s cubic-bezier(0.65, 0, 0.35, 1),
+			color 0.45s ease;
+	}
+
+	.share-row:hover .share-icon :global(.share-icon__glyph),
+	.share-row:focus-visible .share-icon :global(.share-icon__glyph) {
+		color: #fff;
+		transform: rotateY(360deg);
+	}
+
+	.share-icon[data-social="x-social"] {
+		--social-color: #111111;
+	}
+
+	.share-icon[data-social="facebook"] {
+		--social-color: #1877f2;
+	}
+
+	.share-icon[data-social="message-circle"] {
+		--social-color: #25d366;
+	}
+
+	.share-icon[data-social="mail"] {
+		--social-color: #ea4335;
+	}
+
+	.share-icon[data-social="link"] {
+		--social-color: #475569;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.share-icon::before {
+			transition: none;
+		}
+
+		.share-icon :global(.share-icon__glyph) {
+			transition: none;
+		}
+	}
+</style>

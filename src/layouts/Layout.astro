@@ -50,6 +50,9 @@ const { bodyClass, ...seoProps } = Astro.props;
 		</script>
 	</head>
 	<body class={bodyClass}>
+		<div class="bg-ambient" aria-hidden="true">
+			<div class="bg-ambient__spotlight"></div>
+		</div>
 		<ScrollProgressBar />
 		<a href="#main" class="skip-link">Skip to content</a>
 		<Header />
@@ -58,5 +61,6 @@ const { bodyClass, ...seoProps } = Astro.props;
 		</main>
 		<Footer />
 		<script src="../scripts/reveal.ts"></script>
+		<script src="../scripts/ambient.ts"></script>
 	</body>
 </html>

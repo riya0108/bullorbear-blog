@@ -13,7 +13,8 @@ const { text } = Astro.props;
 	<button
 		id="tts-toggle"
 		type="button"
-		class="inline-flex h-11 items-center gap-2 rounded-full bg-surface-card px-5 text-sm font-bold text-ink transition-colors hover:bg-secondary-bg"
+		style="--i: #0ea5e9; --j: #22d3ee;"
+		class="gradient-btn inline-flex h-11 items-center gap-2 rounded-full bg-surface-card px-5 text-sm font-bold text-ink"
 	>
 		<Icon name="headphones" class="h-4.5 w-4.5" />
 		<span data-tts-icon="play"><Icon name="play" class="h-4 w-4" /></span>
@@ -30,24 +31,34 @@ const { text } = Astro.props;
 	</button>
 	<label class="flex items-center gap-1.5 text-xs font-semibold text-mute">
 		Language
-		<select
-			id="tts-lang"
-			class="notranslate h-8 rounded-full bg-surface-card px-2 text-xs font-bold text-ink focus:outline-none"
+		<span
+			class="gradient-select relative inline-flex h-8 items-center rounded-full bg-surface-card"
+			style="--i: #10b981; --j: #06b6d4;"
 		>
-			{languages.map((l) => <option value={l.code}>{l.label}</option>)}
-		</select>
+			<select
+				id="tts-lang"
+				class="notranslate relative z-10 h-full rounded-full bg-transparent px-2 text-xs font-bold text-ink focus:outline-none"
+			>
+				{languages.map((l) => <option value={l.code}>{l.label}</option>)}
+			</select>
+		</span>
 	</label>
 	<label class="flex items-center gap-1.5 text-xs font-semibold text-mute">
 		Speed
-		<select
-			id="tts-rate"
-			class="h-8 rounded-full bg-surface-card px-2 text-xs font-bold text-ink focus:outline-none"
+		<span
+			class="gradient-select relative inline-flex h-8 items-center rounded-full bg-surface-card"
+			style="--i: #f59e0b; --j: #ef4444;"
 		>
-			<option value="0.75">0.75x</option>
-			<option value="1" selected>1x</option>
-			<option value="1.25">1.25x</option>
-			<option value="1.5">1.5x</option>
-		</select>
+			<select
+				id="tts-rate"
+				class="relative z-10 h-full rounded-full bg-transparent px-2 text-xs font-bold text-ink focus:outline-none"
+			>
+				<option value="0.75">0.75x</option>
+				<option value="1" selected>1x</option>
+				<option value="1.25">1.25x</option>
+				<option value="1.5">1.5x</option>
+			</select>
+		</span>
 	</label>
 </div>
 
@@ -345,3 +356,88 @@ const { text } = Astro.props;
 		window.addEventListener("beforeunload", stopPlayback);
 	}
 </script>
+
+<style>
+	/* Gradient reveal + soft glow on hover — inspired by
+	   https://codepen.io/yxwang31/pen/NWYpdxx. Each control sets its own
+	   --i/--j gradient stops. Only the controls themselves animate; the
+	   "Language"/"Speed" label text stays static. */
+	.gradient-btn {
+		position: relative;
+		z-index: 0;
+		transition: color 0.4s ease;
+	}
+
+	.gradient-btn::before,
+	.gradient-btn::after,
+	.gradient-select::before,
+	.gradient-select::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: 9999px;
+		background: linear-gradient(45deg, var(--i), var(--j));
+		opacity: 0;
+		transition: opacity 0.4s ease;
+	}
+
+	.gradient-btn::before,
+	.gradient-select::before {
+		z-index: -1;
+	}
+
+	.gradient-btn::after,
+	.gradient-select::after {
+		z-index: -2;
+		filter: blur(16px);
+	}
+
+	.gradient-btn:hover,
+	.gradient-btn:focus-visible {
+		color: #fff;
+	}
+
+	.gradient-btn:hover::before,
+	.gradient-btn:focus-visible::before {
+		opacity: 1;
+	}
+
+	.gradient-btn:hover::after,
+	.gradient-btn:focus-visible::after {
+		opacity: 0.6;
+	}
+
+	.gradient-select {
+		z-index: 0;
+	}
+
+	.gradient-select select {
+		transition: color 0.4s ease;
+	}
+
+	.gradient-select:hover select,
+	.gradient-select:focus-within select {
+		color: #fff;
+	}
+
+	.gradient-select:hover::before,
+	.gradient-select:focus-within::before {
+		opacity: 1;
+	}
+
+	.gradient-select:hover::after,
+	.gradient-select:focus-within::after {
+		opacity: 0.6;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.gradient-btn::before,
+		.gradient-btn::after,
+		.gradient-select::before,
+		.gradient-select::after,
+		.gradient-btn,
+		.gradient-select select {
+			transition: none;
+		}
+	}
+</style>

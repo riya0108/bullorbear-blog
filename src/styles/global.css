@@ -178,8 +178,28 @@ body {
 	transform: translateY(0);
 }
 
+/* Pop-in variant of .reveal — used for tighter tile grids (e.g. infographics archive) */
+.reveal-pop {
+	opacity: 0;
+	transform: translateY(16px) scale(0.92);
+	transition:
+		opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+		transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-pop.is-visible {
+	opacity: 1;
+	transform: translateY(0) scale(1);
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.reveal {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+
+	.reveal-pop {
 		opacity: 1;
 		transform: none;
 		transition: none;
@@ -192,6 +212,96 @@ body {
 		animation-iteration-count: 1 !important;
 		transition-duration: 0.001ms !important;
 		scroll-behavior: auto !important;
+	}
+}
+
+/* ---------------------------------------------------------------------
+   Ambient background — slow-drifting soft blobs + a subtle cursor-follow
+   glow, both restricted to very low opacity so they read as texture on
+   the cream canvas rather than decoration. Colors stay neutral/warm;
+   --color-primary is reserved for CTAs and never appears here.
+   --------------------------------------------------------------------- */
+.bg-ambient {
+	position: fixed;
+	inset: 0;
+	z-index: -1;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.bg-ambient::before,
+.bg-ambient::after {
+	content: "";
+	position: absolute;
+	width: 42vw;
+	height: 42vw;
+	max-width: 640px;
+	max-height: 640px;
+	border-radius: 50%;
+	filter: blur(90px);
+	opacity: 0.5;
+	background: radial-gradient(circle, var(--color-stone) 0%, transparent 70%);
+	animation: ambient-drift 34s ease-in-out infinite alternate;
+}
+
+.bg-ambient::before {
+	top: -10%;
+	left: -8%;
+}
+
+.bg-ambient::after {
+	right: -10%;
+	bottom: -12%;
+	background: radial-gradient(circle, var(--color-hairline) 0%, transparent 70%);
+	animation-name: ambient-drift-reverse;
+	animation-duration: 40s;
+	animation-delay: -8s;
+}
+
+.bg-ambient__spotlight {
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(
+		480px circle at var(--mx, 50%) var(--my, 30%),
+		var(--color-surface-card) 0%,
+		transparent 72%
+	);
+	opacity: var(--spotlight-opacity, 0);
+	transition: opacity 0.4s ease;
+}
+
+@keyframes ambient-drift {
+	0% {
+		transform: translate(0, 0) scale(1);
+	}
+	100% {
+		transform: translate(6vw, 8vh) scale(1.12);
+	}
+}
+
+@keyframes ambient-drift-reverse {
+	0% {
+		transform: translate(0, 0) scale(1.08);
+	}
+	100% {
+		transform: translate(-5vw, -6vh) scale(1);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.bg-ambient::before,
+	.bg-ambient::after {
+		animation: none;
+	}
+
+	.bg-ambient__spotlight {
+		display: none;
+	}
+}
+
+@media (max-width: 640px), (hover: none) {
+	.bg-ambient__spotlight {
+		display: none;
 	}
 }
 

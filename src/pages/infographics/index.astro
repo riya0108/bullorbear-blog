@@ -1,0 +1,85 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Icon from "../../components/icons/Icon.astro";
+import { infographics } from "../../data/infographics";
+---
+
+<Layout
+	title="Infographics"
+	description="Every Bull or Bear infographic in one place — markets, money, and India, broken down into one glance."
+>
+	<section class="mx-auto max-w-[900px] px-5 pb-4 pt-14 sm:px-6 sm:pt-20">
+		<p class="reveal inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-mute">
+			<Icon name="image-stack" class="h-4 w-4" />
+			The full archive
+		</p>
+		<h1 class="reveal mt-1 text-4xl font-extrabold tracking-tight text-ink sm:text-5xl" data-reveal-delay="60">
+			Infographics
+		</h1>
+		<p class="reveal mt-3 max-w-xl text-lg text-mute" data-reveal-delay="100">
+			Every story we've broken down into one glance — markets, money, and India.
+		</p>
+	</section>
+
+	<section class="mx-auto max-w-[1100px] px-5 py-8 sm:px-6 sm:py-10" aria-label="All infographics">
+		<div class="flex flex-wrap justify-center gap-4 sm:gap-5">
+			{
+				infographics.map((info, i) => (
+					<figure
+						class="reveal reveal-pop w-[190px] overflow-hidden rounded-lg border border-ink/5 bg-surface-card shadow-sm sm:w-[230px] sm:rounded-xl"
+						data-reveal-delay={(i % 10) * 60}
+					>
+						<a href={info.src} target="_blank" rel="noopener noreferrer" class="group block">
+							<span class="holo-sheen relative block overflow-hidden">
+								<img
+									src={info.src}
+									alt={info.alt}
+									loading="lazy"
+									decoding="async"
+									class="block w-full h-auto transition-transform duration-300 group-hover:scale-[1.03]"
+								/>
+							</span>
+						</a>
+						<figcaption class="px-2.5 py-2 text-xs font-semibold leading-snug text-ink sm:px-3 sm:py-2.5 sm:text-sm">
+							{info.caption}
+						</figcaption>
+					</figure>
+				))
+			}
+		</div>
+	</section>
+</Layout>
+
+<style>
+	/* Holographic sheen sweep on hover — inspired by
+	   https://codepen.io/nefejames/pen/ogvNgJq. Scoped to the image only;
+	   the caption below stays untouched. */
+	.holo-sheen::before {
+		content: "";
+		position: absolute;
+		top: -50%;
+		left: -50%;
+		width: 200%;
+		height: 200%;
+		z-index: 1;
+		pointer-events: none;
+		background: linear-gradient(0deg, transparent, transparent 30%, rgba(255, 255, 255, 0.35));
+		transform: rotate(-45deg);
+		opacity: 0;
+		transition:
+			opacity 0.5s ease,
+			transform 0.5s ease;
+	}
+
+	.group:hover .holo-sheen::before,
+	.group:focus-visible .holo-sheen::before {
+		opacity: 1;
+		transform: rotate(-45deg) translateY(100%);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.holo-sheen::before {
+			transition: none;
+		}
+	}
+</style>

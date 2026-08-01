@@ -17,7 +17,8 @@
       "Bash(pkill -f \"remote-debugging-port=9333\")",
       "Bash(curl *)",
       "Bash(npx astro *)",
-      "Bash(astro dev *)"
+      "Bash(astro dev *)",
+      "Bash(git add *)"
     ]
   }
 }

@@ -84,9 +84,10 @@ const socialLinks = [
 								target="_blank"
 								rel="noopener noreferrer"
 								aria-label={s.name}
-								class="grid h-10 w-10 place-items-center rounded-full bg-surface-card text-ink transition-colors hover:bg-primary hover:text-white"
+								data-social={s.icon}
+								class="social-icon relative grid h-10 w-10 place-items-center overflow-hidden rounded-full bg-surface-card text-ink"
 							>
-								<Icon name={s.icon} class="h-4.5 w-4.5" />
+								<Icon name={s.icon} class="social-icon__glyph relative z-10 h-4.5 w-4.5" />
 							</a>
 						))
 					}
@@ -178,3 +179,64 @@ const socialLinks = [
 		}
 	});
 </script>
+
+<style>
+	/* Social icon hover — a brand-colored panel wipes up from the bottom
+	   while the glyph flips on its Y axis, inspired by
+	   https://codepen.io/ephs23/pen/NeQZGx. Size is unchanged (h-10 w-10). */
+	.social-icon::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		top: 100%;
+		background: var(--social-color, var(--color-primary));
+		transition: top 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+	}
+
+	.social-icon:hover::before,
+	.social-icon:focus-visible::before {
+		top: 0;
+	}
+
+	.social-icon :global(.social-icon__glyph) {
+		transition:
+			transform 0.45s cubic-bezier(0.65, 0, 0.35, 1),
+			color 0.45s ease;
+	}
+
+	.social-icon:hover :global(.social-icon__glyph),
+	.social-icon:focus-visible :global(.social-icon__glyph) {
+		color: #fff;
+		transform: rotateY(360deg);
+	}
+
+	.social-icon[data-social="instagram"] {
+		--social-color: #e4405f;
+	}
+
+	.social-icon[data-social="youtube"] {
+		--social-color: #ff0000;
+	}
+
+	.social-icon[data-social="facebook"] {
+		--social-color: #1877f2;
+	}
+
+	.social-icon[data-social="threads"] {
+		--social-color: #000000;
+	}
+
+	.social-icon[data-social="x-social"] {
+		--social-color: #111111;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.social-icon::before {
+			transition: none;
+		}
+
+		.social-icon :global(.social-icon__glyph) {
+			transition: none;
+		}
+	}
+</style>
