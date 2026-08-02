@@ -258,29 +258,36 @@ body {
 	animation-delay: -8s;
 }
 
-/* Faint dot-grid texture, always present at very low opacity. */
+/* Faint dot-grid texture, always present at very low opacity. --content-mask
+   is a data-URI SVG cutout (rebuilt on scroll/resize by src/scripts/ambient.ts)
+   that knocks out the bounding boxes of real content — text, images, cards —
+   so the dots only ever render over genuinely empty canvas. Falls back to
+   "none" (no cutout) before JS has run. */
 .bg-ambient__grid {
 	position: absolute;
 	inset: 0;
 	background-image: radial-gradient(var(--color-stone) 1px, transparent 1px);
 	background-size: 28px 28px;
 	opacity: 0.35;
+	-webkit-mask-image: var(--content-mask, none);
+	mask-image: var(--content-mask, none);
 }
 
-/* Same dot-grid, drawn brighter, revealed only inside a circle that
-   follows the cursor — a flashlight-over-a-grid effect. Position is
-   updated every pointermove by src/scripts/ambient.ts. */
+/* Same dot-grid, drawn brighter, revealed only inside a circle that follows
+   the cursor — a flashlight-over-a-grid effect — and still subject to the
+   same content cutout so the flashlight can't reveal dots under content
+   either. Position is updated every pointermove by src/scripts/ambient.ts. */
 .bg-ambient__spotlight {
 	position: absolute;
 	inset: 0;
 	background-image: radial-gradient(var(--color-ink) 1.5px, transparent 1.5px);
 	background-size: 28px 28px;
-	-webkit-mask-image: radial-gradient(
-		220px circle at var(--mx, 50%) var(--my, 30%),
-		black 0%,
-		transparent 75%
-	);
-	mask-image: radial-gradient(220px circle at var(--mx, 50%) var(--my, 30%), black 0%, transparent 75%);
+	-webkit-mask-image: var(--content-mask, none),
+		radial-gradient(220px circle at var(--mx, 50%) var(--my, 30%), black 0%, transparent 75%);
+	-webkit-mask-composite: source-in;
+	mask-image: var(--content-mask, none),
+		radial-gradient(220px circle at var(--mx, 50%) var(--my, 30%), black 0%, transparent 75%);
+	mask-composite: intersect;
 	opacity: var(--spotlight-opacity, 0);
 	transition: opacity 0.4s ease;
 }
