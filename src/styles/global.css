@@ -327,6 +327,39 @@ body {
 	}
 }
 
+/* Hover shine sweep for images inside blog post content — same sheen as
+   the PostCard thumbnails (see Thumbnail.astro), but self-triggered since
+   these images aren't wrapped in a link. Wrapper span is injected around
+   each #article-body img by src/scripts/img-shine.ts. */
+.img-shine::before {
+	content: "";
+	position: absolute;
+	top: -50%;
+	left: -50%;
+	width: 200%;
+	height: 200%;
+	z-index: 1;
+	pointer-events: none;
+	background: linear-gradient(0deg, transparent, transparent 30%, rgba(255, 255, 255, 0.35));
+	transform: rotate(-45deg);
+	opacity: 0;
+	transition:
+		opacity 0.5s ease,
+		transform 0.5s ease;
+}
+
+.img-shine:hover::before,
+.img-shine:focus-within::before {
+	opacity: 1;
+	transform: rotate(-45deg) translateY(100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.img-shine::before {
+		transition: none;
+	}
+}
+
 /* Google Translate widget — hide default banner/iframe chrome, we drive it
    with our own <select>. See src/components/LanguageSwitcher.astro */
 .goog-te-banner-frame,
