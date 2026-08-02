@@ -17,6 +17,7 @@ const posts = defineCollection({
 	loader: glob({ base: "./src/content/posts", pattern: "**/*.mdx" }),
 	schema: z.object({
 		title: z.string(),
+		seoTitle: z.string().optional(),
 		description: z.string(),
 		category: reference("categories"),
 		tags: z.array(z.string()).default([]),

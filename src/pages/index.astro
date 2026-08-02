@@ -6,6 +6,7 @@ import InfographicStrip from "../components/InfographicStrip.astro";
 import InfographicGallery from "../components/InfographicGallery.astro";
 import AlsoCheckOut from "../components/AlsoCheckOut.astro";
 import DailyQuiz from "../components/DailyQuiz.astro";
+import AboutSection from "../components/AboutSection.astro";
 import Icon from "../components/icons/Icon.astro";
 import { getCollection } from "astro:content";
 
@@ -24,7 +25,42 @@ const alsoCheckOutPosts = archivePosts.slice(0, 6);
 
 <Layout
 	title="Bull or Bear Blogs"
-	description="Independent reads on AI, tech, money, finance, politics, and personal finance — for readers who think in both directions."
+	description="Bull or Bear: finance blogs, personal finance, AI blogs, business, politics and world news — plus SIP/EMI calculators, best credit cards, and a daily quiz."
+	keywords={[
+		"Bull or Bear",
+		"blogs",
+		"finance blogs",
+		"SEO blogs",
+		"travel blogs",
+		"food blogs",
+		"personal finance",
+		"business",
+		"how to",
+		"money management",
+		"SIP calculator",
+		"EMI calculator",
+		"best credit cards",
+		"money psychology",
+		"politics",
+		"AI blogs",
+		"infographics",
+		"gadget review",
+		"gadget comparison",
+		"comparison blogs",
+		"AI use",
+		"AI SEO",
+		"AI business",
+		"how to earn money using AI",
+		"earn money",
+		"money making tips",
+		"GenZ blogs",
+		"daily quiz",
+		"finance quiz",
+		"world news",
+		"latest news",
+		"bullorbear_stories",
+		"bullorbear youtube",
+	]}
 >
 	<section class="mx-auto max-w-5xl px-5 pb-6 pt-10 text-center sm:px-6 sm:pt-14">
 		<p class="reveal inline-flex items-center gap-2 rounded-full bg-surface-card px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-mute">
@@ -107,4 +143,6 @@ const alsoCheckOutPosts = archivePosts.slice(0, 6);
 	/>
 
 	<InfographicGallery />
+
+	<AboutSection />
 </Layout>
