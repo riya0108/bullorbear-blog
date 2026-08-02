@@ -1,0 +1,35 @@
+---
+import Icon from "./icons/Icon.astro";
+import type { MarkdownHeading } from "astro";
+
+export interface Props {
+	headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+
+const items = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+---
+
+{
+	items.length >= 2 && (
+		<details class="not-prose group my-8 rounded-2xl border border-hairline bg-surface-card p-5" open>
+			<summary class="flex cursor-pointer list-none items-center justify-between gap-3 font-bold text-ink [&::-webkit-details-marker]:hidden">
+				<span class="flex items-center gap-2">
+					<Icon name="list" class="h-4 w-4 text-primary" />
+					Table of contents
+				</span>
+				<Icon name="chevron-down" class="h-4 w-4 shrink-0 transition-transform group-open:rotate-180" />
+			</summary>
+			<ol class="mt-4 space-y-2 text-sm">
+				{items.map((h) => (
+					<li class={h.depth === 3 ? "ml-4" : ""}>
+						<a href={`#${h.slug}`} class="text-mute transition-colors hover:text-primary">
+							{h.text}
+						</a>
+					</li>
+				))}
+			</ol>
+		</details>
+	)
+}

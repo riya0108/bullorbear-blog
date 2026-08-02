@@ -1,8 +1,11 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
 ---
 
 <Layout title="Contact" description="Get in touch with the Bull or Bear Blogs team.">
+	<Breadcrumbs items={[{ name: "Contact" }]} />
+
 	<section class="mx-auto max-w-xl px-5 py-16 sm:px-6 sm:py-20">
 		<h1 class="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">Get in touch</h1>
 		<p class="mt-4 text-lg text-mute">

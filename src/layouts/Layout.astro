@@ -16,9 +16,11 @@ export interface Props {
 		author: string;
 		category: string;
 		tags: string[];
+		wordCount?: number;
 	};
 	noIndex?: boolean;
 	bodyClass?: string;
+	keywords?: string[];
 }
 
 const { bodyClass, ...seoProps } = Astro.props;

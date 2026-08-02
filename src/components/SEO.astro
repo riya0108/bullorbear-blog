@@ -10,8 +10,10 @@ export interface Props {
 		author: string;
 		category: string;
 		tags: string[];
+		wordCount?: number;
 	};
 	noIndex?: boolean;
+	keywords?: string[];
 }
 
 const {
@@ -21,31 +23,44 @@ const {
 	type = "website",
 	article,
 	noIndex = false,
+	keywords,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const imageURL = new URL(image, Astro.site);
+const logoURL = new URL("/web-app-manifest-512x512.png", Astro.site);
 const siteName = "Bull or Bear Blogs";
 const fullTitle = title === siteName ? title : `${title} · ${siteName}`;
+
+const publisher = {
+	"@type": "Organization",
+	name: siteName,
+	url: Astro.site?.toString(),
+	logo: {
+		"@type": "ImageObject",
+		url: logoURL.toString(),
+	},
+};
 
 const jsonLd = article
 	? {
 			"@context": "https://schema.org",
-			"@type": "Article",
+			"@type": "BlogPosting",
 			headline: title,
 			description,
 			image: imageURL.toString(),
 			datePublished: article.publishedTime,
 			dateModified: article.modifiedTime ?? article.publishedTime,
-			author: { "@type": "Person", name: article.author },
-			publisher: {
-				"@type": "Organization",
-				name: siteName,
-				url: Astro.site?.toString(),
+			author: { "@type": "Person", name: article.author, url: Astro.site?.toString() },
+			publisher,
+			mainEntityOfPage: {
+				"@type": "WebPage",
+				"@id": canonicalURL.toString(),
 			},
-			mainEntityOfPage: canonicalURL.toString(),
 			articleSection: article.category,
 			keywords: article.tags.join(", "),
+			...(article.wordCount ? { wordCount: article.wordCount } : {}),
+			inLanguage: "en-IN",
 		}
 	: {
 			"@context": "https://schema.org",
@@ -53,6 +68,7 @@ const jsonLd = article
 			name: siteName,
 			url: Astro.site?.toString(),
 			description,
+			publisher,
 			potentialAction: {
 				"@type": "SearchAction",
 				target: `${Astro.site}search?q={search_term_string}`,
@@ -63,6 +79,7 @@ const jsonLd = article
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
+{keywords && keywords.length > 0 && <meta name="keywords" content={keywords.join(", ")} />}
 <link rel="canonical" href={canonicalURL} />
 {noIndex && <meta name="robots" content="noindex, nofollow" />}
 

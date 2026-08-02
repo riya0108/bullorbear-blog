@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import PostCard from "../../components/PostCard.astro";
 import Icon from "../../components/icons/Icon.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { textClass } from "../../lib/categoryStyles";
 
 export async function getStaticPaths() {
@@ -23,6 +24,8 @@ const posts = (await getCollection("posts", ({ data }) => !data.draft && data.ca
 	title={category.data.name}
 	description={`${category.data.description} Browse every Bull or Bear Blogs article on ${category.data.name}.`}
 >
+	<Breadcrumbs items={[{ name: category.data.name }]} />
+
 	<section class="mx-auto max-w-5xl px-5 pb-6 pt-14 sm:px-6 sm:pt-20">
 		<span class={`inline-flex items-center gap-2 text-sm font-bold ${textClass(category.data.accentColor)}`}>
 			<Icon name={category.data.icon} class="h-5 w-5" />

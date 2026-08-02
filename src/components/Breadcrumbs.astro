@@ -1,0 +1,51 @@
+---
+export interface Crumb {
+	name: string;
+	url?: string;
+}
+
+export interface Props {
+	items: Crumb[];
+}
+
+const { items } = Astro.props;
+const trail: Crumb[] = [{ name: "Home", url: "/" }, ...items];
+
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	itemListElement: trail.map((crumb, i) => ({
+		"@type": "ListItem",
+		position: i + 1,
+		name: crumb.name,
+		...(crumb.url ? { item: new URL(crumb.url, Astro.site).toString() } : {}),
+	})),
+};
+---
+
+<nav aria-label="Breadcrumb" class="mx-auto max-w-4xl px-5 pt-6 sm:px-6 lg:px-10">
+	<ol class="flex flex-wrap items-center gap-1.5 text-xs font-semibold text-mute">
+		{
+			trail.map((crumb, i) => (
+				<li class="flex items-center gap-1.5">
+					{i > 0 && (
+						<span aria-hidden="true" class="text-ash">
+							/
+						</span>
+					)}
+					{crumb.url && i < trail.length - 1 ? (
+						<a href={crumb.url} class="transition-colors hover:text-ink">
+							{crumb.name}
+						</a>
+					) : (
+						<span aria-current="page" class="text-ink">
+							{crumb.name}
+						</span>
+					)}
+				</li>
+			))
+		}
+	</ol>
+</nav>
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

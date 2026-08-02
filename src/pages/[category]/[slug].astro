@@ -8,6 +8,8 @@ import ListenButton from "../../components/ListenButton.astro";
 import ShareBar from "../../components/ShareBar.astro";
 import Comments from "../../components/Comments.astro";
 import PostCard from "../../components/PostCard.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import TableOfContents from "../../components/TableOfContents.astro";
 import { dotClass, textClass } from "../../lib/categoryStyles";
 import { readingTime } from "../../lib/readingTime";
 import { stripMarkdown } from "../../lib/stripMarkdown";
@@ -24,9 +26,10 @@ export async function getStaticPaths() {
 }
 
 const { post, category } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 const time = readingTime(post.body);
 const plainText = stripMarkdown(post.body);
+const wordCount = plainText.split(/\s+/).filter(Boolean).length;
 const dateLabel = post.data.pubDate.toLocaleDateString("en-IN", {
 	month: "long",
 	day: "numeric",
@@ -43,21 +46,30 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
 ---
 
 <Layout
-	title={post.data.title}
+	title={post.data.seoTitle ?? post.data.title}
 	description={post.data.description}
 	image={post.data.heroImage}
 	type="article"
+	keywords={post.data.tags}
 	article={{
 		publishedTime: post.data.pubDate.toISOString(),
 		modifiedTime: post.data.updatedDate?.toISOString(),
 		author: post.data.author.name,
 		category: category.data.name,
 		tags: post.data.tags,
+		wordCount,
 	}}
 >
 	<ReadingProgressRing minutes={time.minutes} targetId="article-content" />
 
-	<article id="article-content" class="mx-auto max-w-4xl px-5 pb-8 pt-12 sm:px-6 sm:pt-16 lg:px-10">
+	<Breadcrumbs
+		items={[
+			{ name: category.data.name, url: `/${category.data.slug}/` },
+			{ name: post.data.title },
+		]}
+	/>
+
+	<article id="article-content" class="mx-auto max-w-4xl px-5 pb-8 pt-6 sm:px-6 lg:px-10">
 		<a
 			href={`/${category.data.slug}/`}
 			class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide"
@@ -90,6 +102,8 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
 			<ListenButton text={plainText} />
 			<ShareBar title={post.data.title} url={canonicalUrl} />
 		</div>
+
+		<TableOfContents headings={headings} />
 
 		<div
 			id="article-body"

@@ -1,9 +1,12 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Icon from "../../components/icons/Icon.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
 ---
 
 <Layout title="Search" description="Search every Bull or Bear Blogs article." noIndex>
+	<Breadcrumbs items={[{ name: "Search" }]} />
+
 	<section class="mx-auto max-w-3xl px-5 pb-6 pt-14 sm:px-6 sm:pt-20">
 		<h1 class="text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">Search articles</h1>
 		<div class="mt-6 flex h-14 items-center gap-3 rounded-full bg-surface-card px-5">

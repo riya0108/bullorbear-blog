@@ -1,9 +1,12 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { siteConfig } from "../../lib/siteConfig";
 ---
 
 <Layout title="Editorial Policy" description={`Editorial policy for ${siteConfig.name}.`} noIndex>
+	<Breadcrumbs items={[{ name: "Editorial Policy" }]} />
+
 	<section class="mx-auto max-w-3xl px-5 py-16 sm:px-6 sm:py-20">
 		<h1 class="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">Editorial Policy</h1>
 		<div class="prose prose-neutral mt-8 max-w-none prose-headings:font-extrabold prose-headings:text-ink prose-p:text-body prose-li:text-body dark:prose-invert">

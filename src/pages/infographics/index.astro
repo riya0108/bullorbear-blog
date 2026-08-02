@@ -1,6 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Icon from "../../components/icons/Icon.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { infographics } from "../../data/infographics";
 ---
 
@@ -8,6 +9,8 @@ import { infographics } from "../../data/infographics";
 	title="Infographics"
 	description="Every Bull or Bear infographic in one place — markets, money, and India, broken down into one glance."
 >
+	<Breadcrumbs items={[{ name: "Infographics" }]} />
+
 	<section class="mx-auto max-w-[900px] px-5 pb-4 pt-14 sm:px-6 sm:pt-20">
 		<p class="reveal inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-mute">
 			<Icon name="image-stack" class="h-4 w-4" />

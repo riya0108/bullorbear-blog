@@ -48,8 +48,20 @@ function initAmbient() {
 		if (!maskRaf) maskRaf = requestAnimationFrame(updateContentMask);
 	}
 
+	// Scrolling (including a smooth anchor-link jump) can fire dozens of
+	// scroll events per second. Recomputing the mask on every one of them
+	// forces a full-document layout pass each frame, which is heavy enough
+	// on long articles to stall/cancel the browser's native smooth-scroll
+	// animation (e.g. clicking a table-of-contents link). Debounce so the
+	// mask only recomputes once scrolling settles.
+	let scrollDebounce = 0;
+	function scheduleMaskUpdateDebounced() {
+		window.clearTimeout(scrollDebounce);
+		scrollDebounce = window.setTimeout(scheduleMaskUpdate, 120);
+	}
+
 	updateContentMask();
-	window.addEventListener("scroll", scheduleMaskUpdate, { passive: true });
+	window.addEventListener("scroll", scheduleMaskUpdateDebounced, { passive: true });
 	window.addEventListener("resize", scheduleMaskUpdate);
 	window.addEventListener("load", scheduleMaskUpdate);
 
