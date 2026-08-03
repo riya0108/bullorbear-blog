@@ -9,14 +9,17 @@ export interface Stat {
 
 function Counter({ value, suffix = "" }: { value: number; suffix?: string }) {
 	const ref = useRef<HTMLSpanElement>(null);
-	const isInView = useInView(ref, { once: true, margin: "-40px" });
+	const isInView = useInView(ref, { margin: "-40px" });
 	const shouldReduceMotion = useReducedMotion();
 	const [display, setDisplay] = useState(shouldReduceMotion ? value : 0);
 
 	useEffect(() => {
-		if (!isInView) return;
 		if (shouldReduceMotion) {
 			setDisplay(value);
+			return;
+		}
+		if (!isInView) {
+			setDisplay(0);
 			return;
 		}
 		const controls = animate(0, value, {

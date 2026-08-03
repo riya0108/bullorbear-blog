@@ -1,0 +1,340 @@
+---
+import Icon from "./icons/Icon.astro";
+
+interface FaqItem {
+	q: string;
+	a: string;
+}
+
+interface FaqGroup {
+	label: string;
+	items: FaqItem[];
+}
+
+const groups: FaqGroup[] = [
+	{
+		label: "Bull or bear & markets",
+		items: [
+			{
+				q: "What does \"bull or bear\" mean?",
+				a: "A bull market is a stretch where prices are rising and confidence is high; a bear market is the opposite — falling prices and widespread pessimism, usually defined as a 20%+ drop from a recent high. Our name is a nod to that fork in the road every investor faces: which way is this actually leaning?",
+			},
+			{
+				q: "Are we in a bull market or a bear market right now?",
+				a: "It depends on the asset and the timeframe — equities, gold, and crypto can each be in a different phase at once, and a single index can look bullish on a one-year chart and bearish on a one-month chart. We break down what's actually driving the current mood in our <a href=\"/money/\">money</a> and <a href=\"/finance/\">finance</a> coverage rather than calling one label for the whole market.",
+			},
+		],
+	},
+	{
+		label: "Blogs on Bull or Bear",
+		items: [
+			{
+				q: "What are blogs, and what makes Bull or Bear's different?",
+				a: "A blog is a regularly updated set of articles on a site, usually written in a more direct, first-person voice than traditional news. Bull or Bear runs <a href=\"/ai/\">AI</a>, <a href=\"/finance/\">finance</a>, <a href=\"/personal-finance/\">personal finance</a>, <a href=\"/politics/\">politics</a>, and <a href=\"/world/\">world news</a> blogs written in plain language, backed by free calculators and infographics instead of just opinion.",
+			},
+			{
+				q: "Where can I find good AI news blogs?",
+				a: "Our <a href=\"/ai/\">AI section</a> covers AI news the way we cover markets — what changed, who it affects, and what it means for your money and your job, rather than just product announcements.",
+			},
+			{
+				q: "What topics do artificial intelligence blogs usually cover?",
+				a: "Most AI blogs cover new model releases, AI tools and workflows, AI in business, and explainer topics like what AI actually is. Ours leans into the practical side: AI SEO, AI-driven business workflows, and how to earn money using AI skills.",
+			},
+			{
+				q: "What's a good AI blogs website to bookmark?",
+				a: "Look for one that explains AI in plain language and ties it back to something useful — money, work, or a skill you can apply. That's the gap our <a href=\"/ai/\">AI blogs</a> are built to fill.",
+			},
+			{
+				q: "Are there AI blogs for beginners?",
+				a: "Yes — start with explainer-style posts (what AI is, how generative AI works, what agentic AI means) before moving to workflow and tooling posts. Our <a href=\"/ai/\">AI section</a> is organised so the fundamentals sit alongside the more advanced, practical guides.",
+			},
+			{
+				q: "Which AI blogs are useful for developers?",
+				a: "Developer-focused AI content tends to live in three places: trending repositories on AI blogs GitHub pages, engineering write-ups on AI blogs Medium, and news-style coverage like ours that tracks what's shipping and why it matters commercially — useful context before you dig into the code yourself.",
+			},
+			{
+				q: "What are the best finance blogs in India?",
+				a: "The best finance blogs for India-specific needs cover local instruments — SIPs, PPF, EPF, income tax slabs, and rupee-denominated EMIs — rather than generic US-centric advice. Our <a href=\"/personal-finance/\">personal finance</a> and <a href=\"/finance/\">finance</a> sections, paired with our <a href=\"/calculators/\">calculators</a>, are built specifically around Indian numbers and rules.",
+			},
+			{
+				q: "What are good finance blogs for someone just starting out?",
+				a: "Start with blogs that explain the \"why\" before the \"how\" — budgeting basics, the psychology behind spending, and simple explainers on SIPs and EMIs. Our <a href=\"/personal-finance/\">personal finance</a> posts are written for exactly that starting point, with no assumed jargon.",
+			},
+			{
+				q: "Which personal finance blogs are most recommended?",
+				a: "The ones worth following consistently update for rule changes (tax slabs, STT, interest rates) and back up claims with a calculator you can run yourself. That combination — current context plus tools — is what we aim for across <a href=\"/personal-finance/\">personal finance</a> and <a href=\"/calculators/\">calculators</a>.",
+			},
+			{
+				q: "What do finance blog examples actually look like?",
+				a: "A typical post walks through one problem end to end — say, how a rising STT affects a trader — with the numbers worked out and a plain conclusion. Our <a href=\"/personal-finance/\">personal finance</a> and <a href=\"/finance/\">finance</a> archives are full of that format if you want examples to model.",
+			},
+			{
+				q: "Can I find finance blogs as a PDF or downloadable guide?",
+				a: "We don't gate content behind PDF downloads — every guide is a free, fully readable web page so it stays current when rules change, unlike a PDF that goes stale the day tax slabs or interest rates move.",
+			},
+			{
+				q: "How many personal finance blogs are there?",
+				a: "Thousands, globally — the space has grown fast because barriers to publishing are low. The harder question is how many are kept current; that's the filter worth applying more than raw count.",
+			},
+			{
+				q: "How do personal finance blogs make money?",
+				a: "Common models include display ads, affiliate links (credit cards, brokers, insurance), sponsored posts, and paid tools or courses. We disclose affiliate relationships directly on posts like our <a href=\"/personal-finance/best-cashback-credit-cards-in-india-2026/\">credit card roundups</a> so the incentive is never hidden.",
+			},
+			{
+				q: "How much do finance blogs actually earn?",
+				a: "It ranges from nothing to a full-time income, driven mostly by traffic volume and affiliate conversion rather than ad revenue alone — a single well-ranked credit card or loan comparison post can outearn dozens of general posts combined.",
+			},
+			{
+				q: "How do I start writing my own blog?",
+				a: "Pick a narrow topic you can write about consistently, publish on a regular schedule, and optimise each post for one clear search intent rather than trying to cover everything at once. Consistency and a defined niche matter more at the start than design or tooling.",
+			},
+		],
+	},
+	{
+		label: "Artificial intelligence, explained",
+		items: [
+			{
+				q: "What is AI (Artificial Intelligence)?",
+				a: "AI is software that performs tasks — recognising patterns, generating text or images, making predictions — that would normally require human intelligence. Modern AI is mostly built on machine learning, where a model learns patterns from large datasets instead of following hand-written rules.",
+			},
+			{
+				q: "AI kya hai?",
+				a: "AI, yaani Artificial Intelligence, ek aisi technology hai jisme computer ya software insano jaisi soch — jaise pattern pehchanna, sawalon ka jawab dena, ya text/image banana — apne aap kar sakta hai, bina step-by-step insani nirdesh ke.",
+			},
+			{
+				q: "What is the full form of AI?",
+				a: "AI stands for Artificial Intelligence.",
+			},
+			{
+				q: "What is Agentic AI?",
+				a: "Agentic AI refers to AI systems that don't just answer a single prompt but can plan a multi-step task, use tools, and act with a degree of autonomy to reach a goal — for example, researching a topic, drafting a report, and checking its own work without a human directing each step.",
+			},
+			{
+				q: "What is Generative AI?",
+				a: "Generative AI is a category of AI that creates new content — text, images, audio, code — rather than just classifying or predicting from existing data. Chatbots, image generators, and AI writing tools are all generative AI.",
+			},
+			{
+				q: "How much water does AI use?",
+				a: "Training and running large AI models consumes real water, mostly for cooling data centres — estimates vary widely depending on the model size, hardware, and the data centre's location and cooling method, and remain an active area of research and disclosure debate.",
+			},
+		],
+	},
+	{
+		label: "EMI calculators",
+		items: [
+			{
+				q: "What is an EMI calculator and how does it work?",
+				a: "An EMI calculator computes your Equated Monthly Instalment using the loan amount, interest rate, and tenure, based on the standard reducing-balance formula. Our <a href=\"/calculators/emi-calculator/\">EMI calculator</a> also breaks down the year-by-year split between principal and interest.",
+			},
+			{
+				q: "How do I calculate EMI for a car loan?",
+				a: "Enter the car loan amount, the interest rate your lender quotes, and the tenure in years into our <a href=\"/calculators/car-loan-emi-calculator/\">car loan EMI calculator</a> — it's pre-filled with typical car loan defaults so you can adjust from a realistic starting point.",
+			},
+			{
+				q: "How does a home loan EMI calculator work?",
+				a: "The same reducing-balance formula applies, just at home-loan scale and tenure — typically 15 to 30 years. Our <a href=\"/calculators/home-loan-emi-calculator/\">home loan EMI calculator</a> shows the full amortisation schedule so you can see how much of each instalment goes to interest in the early years.",
+			},
+			{
+				q: "How do I calculate EMI for a personal loan?",
+				a: "Use our <a href=\"/calculators/emi-calculator/\">EMI calculator</a> with your personal loan's amount, rate, and tenure. Personal loans usually carry higher interest and shorter tenures than home or car loans, so the interest share of each EMI is more front-loaded.",
+			},
+			{
+				q: "How do I find my monthly EMI?",
+				a: "Plug your loan amount, annual interest rate, and tenure into our <a href=\"/calculators/emi-calculator/\">EMI calculator</a> and it computes the monthly instalment instantly, along with total interest payable over the loan.",
+			},
+			{
+				q: "Will an EMI calculator match SBI's or HDFC's numbers exactly?",
+				a: "It should be very close, since all lenders use the same reducing-balance EMI formula — small differences usually come from processing fees, insurance premiums, or rounding that a bank's own calculator may bundle in. Use the interest rate and tenure from your actual loan offer for the closest match.",
+			},
+			{
+				q: "How does a down payment change my EMI?",
+				a: "A larger down payment reduces the loan principal, which directly lowers both your EMI and total interest paid. In our <a href=\"/calculators/emi-calculator/\">EMI calculator</a>, enter the loan amount after subtracting your down payment to see the effect.",
+			},
+			{
+				q: "Can I calculate EMI in months, like for a mobile phone?",
+				a: "Yes — our <a href=\"/calculators/emi-calculator/\">EMI calculator</a> works for any tenure; just convert short terms like 6, 9, or 12 months into years (e.g. 0.5, 0.75, 1) when entering the loan tenure, or use months directly if the field allows it.",
+			},
+		],
+	},
+	{
+		label: "SIP, SWP & investment calculators",
+		items: [
+			{
+				q: "What is a SIP calculator, and how does it compare to Groww, SBI, or HDFC's?",
+				a: "A SIP calculator projects the future value of a monthly mutual fund investment using compounded growth. The underlying math is standard across platforms, so our <a href=\"/calculators/sip-calculator/\">SIP calculator</a> should track closely with Groww's, SBI's, or HDFC's — differences usually come down to the assumed rate of return, not the formula.",
+			},
+			{
+				q: "What is a step-up SIP calculator?",
+				a: "A step-up (or top-up) SIP increases your monthly investment by a fixed percentage each year, so your contributions rise alongside your income. Our <a href=\"/calculators/step-up-sip-calculator/\">step-up SIP calculator</a> models exactly that, and typically projects a larger final corpus than a flat SIP of the same starting amount.",
+			},
+			{
+				q: "What is an SWP calculator?",
+				a: "A Systematic Withdrawal Plan (SWP) calculator shows how a lump sum shrinks or sustains itself when you withdraw a fixed amount every month while the rest stays invested. Try ours at <a href=\"/calculators/swp-calculator/\">/calculators/swp-calculator/</a> — it also flags if your withdrawal rate is unsustainable.",
+			},
+			{
+				q: "What's the difference between a monthly SIP and a daily SIP?",
+				a: "A monthly SIP debits a fixed amount once a month; a daily SIP splits that into smaller amounts debited on market days, which averages your purchase price slightly more often. Over the long run, the difference in returns is usually small — our <a href=\"/calculators/sip-calculator/\">SIP calculator</a> uses monthly compounding, which is how most Indian SIPs are actually structured.",
+			},
+			{
+				q: "What is a Gold SIP, and is there a calculator for it?",
+				a: "A Gold SIP lets you invest a fixed amount into gold (via ETFs or digital gold) every month, the same way an equity SIP works. We don't run a separate gold-specific calculator, but our <a href=\"/calculators/sip-calculator/\">SIP calculator</a> works for any expected rate of return, and our <a href=\"/money/is-gold-still-a-good-investment-in-2026/\">gold investment guide</a> covers whether it's worth doing right now.",
+			},
+		],
+	},
+	{
+		label: "Infographics",
+		items: [
+			{
+				q: "What's an example of a good infographic?",
+				a: "A good infographic takes one complex idea — say, how a rate hike moves EMIs — and reduces it to a single glance: one chart or flow, minimal text, no scrolling required. Browse ours at <a href=\"/infographics/\">/infographics/</a> for examples across markets and money topics.",
+			},
+			{
+				q: "Where can I find free infographics?",
+				a: "Every infographic in our <a href=\"/infographics/\">infographics archive</a> is free to view, and each one is paired with the full article behind it if you want the detailed explanation.",
+			},
+			{
+				q: "Are infographics useful for students?",
+				a: "Yes — infographics are built for fast comprehension, which makes them useful for revising a concept quickly or getting a plain-language overview before reading a denser source. Our finance and markets infographics are written to be understandable without prior background.",
+			},
+			{
+				q: "What makes a good infographics website?",
+				a: "A good one is organised by topic, loads fast, and doesn't force you to hunt for the article behind each image. Our <a href=\"/infographics/\">infographics page</a> keeps the full archive in one scrollable place with captions linking back to the source story.",
+			},
+		],
+	},
+	{
+		label: "Gadgets",
+		items: [
+			{
+				q: "What are some cool gadgets for men who have everything?",
+				a: "For someone who already owns the obvious tech, look at gadgets that solve a specific small annoyance rather than another general-purpose device — a good travel charger, a mechanical keyboard, a smart tracker for keys or luggage, or a niche audio or fitness gadget they wouldn't buy themselves.",
+			},
+			{
+				q: "What gadgets do I actually need?",
+				a: "Start from a real, recurring problem — not a trending product list — and work backward to whether a gadget actually solves it. Our <a href=\"/tech/\">tech coverage</a> reviews gadgets on exactly that basis: whether it's worth the money, not just whether it's new.",
+			},
+		],
+	},
+];
+
+const faqItems = groups.flatMap((g) => g.items);
+
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@type": "FAQPage",
+	mainEntity: faqItems.map((item) => ({
+		"@type": "Question",
+		name: item.q,
+		acceptedAnswer: {
+			"@type": "Answer",
+			text: item.a,
+		},
+	})),
+};
+
+// Show the first few questions right away; the rest sit behind a "show more" dropdown.
+const VISIBLE_COUNT = 5;
+
+interface Segment {
+	label: string;
+	items: FaqItem[];
+}
+
+function segmentByGroup(flat: { groupLabel: string; item: FaqItem }[]): Segment[] {
+	const segments: Segment[] = [];
+	for (const { groupLabel, item } of flat) {
+		const last = segments[segments.length - 1];
+		if (last && last.label === groupLabel) {
+			last.items.push(item);
+		} else {
+			segments.push({ label: groupLabel, items: [item] });
+		}
+	}
+	return segments;
+}
+
+const flat = groups.flatMap((g) => g.items.map((item) => ({ groupLabel: g.label, item })));
+const visibleSegments = segmentByGroup(flat.slice(0, VISIBLE_COUNT));
+const hiddenSegments = segmentByGroup(flat.slice(VISIBLE_COUNT));
+const hiddenCount = flat.length - VISIBLE_COUNT;
+---
+
+<section
+	class="mx-auto max-w-4xl px-5 py-14 sm:px-6 sm:py-20 lg:px-10"
+	aria-labelledby="faq-heading"
+>
+	<div class="reveal">
+		<p class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-mute">
+			<Icon name="message-circle" class="h-4 w-4" />
+			Frequently asked
+		</p>
+		<h2 id="faq-heading" class="mt-1 text-2xl font-extrabold text-ink sm:text-3xl">
+			Questions people ask us
+		</h2>
+		<p class="mt-3 max-w-2xl text-body">
+			Straight answers on AI, finance blogs, EMI and SIP calculators, infographics, and a few
+			things people search for while they're here.
+		</p>
+	</div>
+
+	<div class="mt-8 flex flex-col gap-8">
+		{
+			visibleSegments.map((segment) => (
+				<div>
+					<h3 class="mb-3 text-xs font-bold uppercase tracking-wide text-mute">{segment.label}</h3>
+					<div class="flex flex-col gap-2.5">
+						{segment.items.map((item) => (
+							<details class="group/item rounded-2xl border border-hairline bg-surface-card p-5">
+								<summary class="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-bold text-ink [&::-webkit-details-marker]:hidden">
+									<span set:html={item.q} />
+									<Icon
+										name="chevron-down"
+										class="h-4 w-4 shrink-0 text-mute transition-transform group-open/item:rotate-180"
+									/>
+								</summary>
+								<p class="mt-3 text-sm leading-relaxed text-body" set:html={item.a} />
+							</details>
+						))}
+					</div>
+				</div>
+			))
+		}
+
+		{
+			hiddenCount > 0 && (
+				<details class="group/more rounded-2xl border border-hairline bg-surface-card p-5">
+					<summary class="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-bold text-ink [&::-webkit-details-marker]:hidden">
+						<span>Show {hiddenCount} more questions</span>
+						<Icon
+							name="chevron-down"
+							class="h-4 w-4 shrink-0 text-mute transition-transform group-open/more:rotate-180"
+						/>
+					</summary>
+					<div class="mt-6 flex flex-col gap-8">
+						{hiddenSegments.map((segment) => (
+							<div>
+								<h3 class="mb-3 text-xs font-bold uppercase tracking-wide text-mute">{segment.label}</h3>
+								<div class="flex flex-col gap-2.5">
+									{segment.items.map((item) => (
+										<details class="group/item rounded-2xl border border-hairline bg-canvas p-5">
+											<summary class="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-bold text-ink [&::-webkit-details-marker]:hidden">
+												<span set:html={item.q} />
+												<Icon
+													name="chevron-down"
+													class="h-4 w-4 shrink-0 text-mute transition-transform group-open/item:rotate-180"
+												/>
+											</summary>
+											<p class="mt-3 text-sm leading-relaxed text-body" set:html={item.a} />
+										</details>
+									))}
+								</div>
+							</div>
+						))}
+					</div>
+				</details>
+			)
+		}
+	</div>
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
