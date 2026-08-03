@@ -69,12 +69,17 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 
 <script>
 	const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+	const CONTACT_ENDPOINT =
+		"https://script.google.com/macros/s/AKfycbwVQ1XAF4dGfZtad8iHlg5uoLhFPJKklMtDEtAkM0PhdKExBw03c2PxOHzNpVBJDUpuCg/exec";
 
 	const form = document.getElementById("contact-form") as HTMLFormElement | null;
+	const nameInput = document.getElementById("name") as HTMLInputElement | null;
 	const emailInput = document.getElementById("email") as HTMLInputElement | null;
+	const messageInput = document.getElementById("message") as HTMLTextAreaElement | null;
 	const emailError = document.querySelector<HTMLElement>(".email-error");
+	const submitButton = form?.querySelector<HTMLButtonElement>("button[type=submit]");
 
-	form?.addEventListener("submit", (e) => {
+	form?.addEventListener("submit", async (e) => {
 		e.preventDefault();
 		const value = emailInput?.value.trim() ?? "";
 
@@ -87,8 +92,26 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 
 		emailError?.classList.add("hidden");
 		emailInput?.removeAttribute("aria-invalid");
-		form.classList.add("hidden");
-		document.getElementById("contact-success")?.classList.remove("hidden");
+		submitButton?.setAttribute("disabled", "true");
+
+		try {
+			await fetch(CONTACT_ENDPOINT, {
+				method: "POST",
+				body: JSON.stringify({
+					name: nameInput?.value.trim() ?? "",
+					email: value,
+					message: messageInput?.value.trim() ?? "",
+				}),
+			});
+			form.classList.add("hidden");
+			document.getElementById("contact-success")?.classList.remove("hidden");
+		} catch {
+			if (emailError) {
+				emailError.textContent = "Something went wrong. Please try again.";
+				emailError.classList.remove("hidden");
+			}
+			submitButton?.removeAttribute("disabled");
+		}
 	});
 
 	emailInput?.addEventListener("input", () => {

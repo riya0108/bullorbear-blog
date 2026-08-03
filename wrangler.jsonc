@@ -1,0 +1,16 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "bullorbear-blog",
+	"compatibility_date": "2026-08-01",
+	"assets": {
+		"directory": "./dist",
+		"not_found_handling": "404-page"
+	},
+	"routes": [
+		{ "pattern": "bullorbear.in", "custom_domain": true, "zone_name": "bullorbear.in" },
+		{ "pattern": "www.bullorbear.in", "custom_domain": true, "zone_name": "bullorbear.in" }
+	],
+	"observability": {
+		"enabled": true
+	}
+}

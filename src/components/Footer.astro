@@ -150,12 +150,15 @@ const socialLinks = [
 
 <script>
 	const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+	const NEWSLETTER_ENDPOINT =
+		"https://script.google.com/macros/s/AKfycbxNysSWYP1vDsCjzY9Kq55HV2xVzTCOhN9HK1V9rVGjsT3AxcOx3gjPRTyzogtDrref4A/exec";
 
 	const form = document.querySelector<HTMLFormElement>(".newsletter-form");
 	const input = form?.querySelector<HTMLInputElement>("#newsletter-email");
 	const error = document.querySelector<HTMLElement>(".newsletter-error");
+	const submitButton = form?.querySelector<HTMLButtonElement>("button[type=submit]");
 
-	form?.addEventListener("submit", (e) => {
+	form?.addEventListener("submit", async (e) => {
 		e.preventDefault();
 		const value = input?.value.trim() ?? "";
 
@@ -168,8 +171,22 @@ const socialLinks = [
 
 		error?.classList.add("hidden");
 		input?.removeAttribute("aria-invalid");
-		form.classList.add("hidden");
-		document.querySelector(".newsletter-success")?.classList.remove("hidden");
+		submitButton?.setAttribute("disabled", "true");
+
+		try {
+			await fetch(NEWSLETTER_ENDPOINT, {
+				method: "POST",
+				body: JSON.stringify({ email: value }),
+			});
+			form.classList.add("hidden");
+			document.querySelector(".newsletter-success")?.classList.remove("hidden");
+		} catch {
+			if (error) {
+				error.textContent = "Something went wrong. Please try again.";
+				error.classList.remove("hidden");
+			}
+			submitButton?.removeAttribute("disabled");
+		}
 	});
 
 	input?.addEventListener("input", () => {

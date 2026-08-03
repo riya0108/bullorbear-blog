@@ -299,6 +299,25 @@ const { name, class: className = "" } = Astro.props;
 		)
 	}
 	{
+		name === "alert-triangle" && (
+			<>
+				<path d="M12 3.5 21.5 20h-19L12 3.5Z" />
+				<line x1="12" y1="9.3" x2="12" y2="13.8" />
+				<line x1="12" y1="16.8" x2="12" y2="16.8" stroke-width="2.6" />
+			</>
+		)
+	}
+	{
+		name === "refresh-cw" && (
+			<>
+				<path d="M21 12a9 9 0 0 1-15.3 6.4L3 15.9" />
+				<path d="M3 12a9 9 0 0 1 15.3-6.4L21 8.1" />
+				<polyline points="3 4.5 3 9.5 8 9.5" />
+				<polyline points="21 19.5 21 14.5 16 14.5" />
+			</>
+		)
+	}
+	{
 		name === "list" && (
 			<>
 				<line x1="9" y1="6" x2="20" y2="6" />
