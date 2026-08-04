@@ -21,7 +21,8 @@
       "Bash(git add *)",
       "Bash(python3 *)",
       "Bash(xargs -I{} sh -c 'echo {}: $\\(grep -c \"^## \" {}\\)')",
-      "Bash(sort -t: -k2 -n)"
+      "Bash(sort -t: -k2 -n)",
+      "Bash(npm run *)"
     ]
   }
 }
