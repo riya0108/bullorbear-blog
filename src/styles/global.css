@@ -360,6 +360,39 @@ body {
 	}
 }
 
+/* "OUTPUT" prompt used in MDX posts to point at a pair of result images
+   (e.g. the invoice generator review post). MDX can't use Astro scoped
+   styles, so this lives globally. Mirrors .quiz-hover-hint's bob motion. */
+.output-hint {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.125rem;
+	color: var(--color-mute);
+	animation: output-hint-bob 2.4s ease-in-out infinite;
+}
+
+.output-hint__arrow {
+	width: 26px;
+	height: 26px;
+}
+
+@keyframes output-hint-bob {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(5px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.output-hint {
+		animation: none;
+	}
+}
+
 /* Google Translate widget — hide default banner/iframe chrome, we drive it
    with our own <select>. See src/components/LanguageSwitcher.astro */
 .goog-te-banner-frame,
