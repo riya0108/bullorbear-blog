@@ -318,6 +318,16 @@ const { name, class: className = "" } = Astro.props;
 		)
 	}
 	{
+		name === "gem" && (
+			<>
+				<path d="M6 3h12l3 6-9 12L3 9Z" />
+				<path d="M3 9h18" />
+				<path d="M9 3 12 9l-3 12" />
+				<path d="M15 3 12 9l3 12" />
+			</>
+		)
+	}
+	{
 		name === "list" && (
 			<>
 				<line x1="9" y1="6" x2="20" y2="6" />

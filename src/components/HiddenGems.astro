@@ -1,0 +1,156 @@
+---
+import Icon from "./icons/Icon.astro";
+import { hiddenGems } from "../data/hiddenGems";
+---
+
+<section
+	class="mx-auto max-w-[1600px] px-5 py-10 sm:px-6 sm:py-14 lg:px-10 xl:px-16"
+	aria-labelledby="hidden-gems-heading"
+>
+	<div class="flex items-end justify-between gap-4">
+		<div>
+			<p class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-mute">
+				<Icon name="gem" class="h-4 w-4 text-primary" />
+				Small, useful, easy to miss
+			</p>
+			<h2 id="hidden-gems-heading" class="mt-1 text-2xl font-extrabold text-ink sm:text-3xl">
+				Pretty Useful Websites (Hidden Treasures)
+			</h2>
+			<p class="mt-2 max-w-xl text-sm text-mute">
+				Tools that quietly do their one job better than anything else out there — and somehow
+				never rank for it. We only add a site here once we've actually used it.
+			</p>
+		</div>
+		<a href="/hidden-gems/" class="hidden shrink-0 items-center gap-1 text-sm font-bold text-ink hover:text-primary sm:inline-flex">
+			View all
+			<Icon name="arrow-right" class="h-4 w-4" />
+		</a>
+	</div>
+
+	<div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+		{
+			hiddenGems.map((gem, i) => {
+				const { hostname } = new URL(gem.url);
+				return (
+					<article class="reveal reveal-pop flex flex-col overflow-hidden rounded-[1.75rem] border border-hairline bg-surface-card" data-reveal-delay={i * 80}>
+						<a
+							href={gem.url}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="gem-preview group relative block border-b border-hairline bg-canvas"
+							aria-label={`Open the live preview of ${gem.name} in a new tab`}
+						>
+							<div class="flex items-center gap-1.5 border-b border-hairline bg-surface-card px-3 py-2">
+								<span class="h-2.5 w-2.5 rounded-full bg-bear/60" />
+								<span class="h-2.5 w-2.5 rounded-full bg-primary/50" />
+								<span class="h-2.5 w-2.5 rounded-full bg-bull/60" />
+								<span class="ml-2 truncate rounded-full bg-canvas px-2.5 py-0.5 text-[11px] font-semibold text-mute">
+									{hostname}
+								</span>
+							</div>
+							<div class="gem-preview__frame">
+								<iframe
+									src={gem.url}
+									title={`Live preview of ${gem.name}`}
+									loading="lazy"
+									tabindex="-1"
+									aria-hidden="true"
+									class="gem-preview__iframe"
+								/>
+							</div>
+							<div class="gem-preview__overlay">
+								<span class="inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-xs font-bold text-canvas">
+									Open live preview
+									<Icon name="arrow-right" class="h-3.5 w-3.5" />
+								</span>
+							</div>
+						</a>
+
+						<div class="flex flex-1 flex-col p-6">
+							<div class="flex flex-wrap gap-1.5">
+								{gem.tags.map((tag) => (
+									<span class="rounded-full bg-canvas px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-mute">
+										{tag}
+									</span>
+								))}
+							</div>
+
+							<h3 class="mt-3 text-lg font-extrabold text-ink">{gem.name}</h3>
+							<p class="mt-1 text-sm font-semibold text-primary">{gem.tagline}</p>
+							<p class="mt-3 text-sm leading-relaxed text-mute">{gem.description}</p>
+
+							<div class="mt-4 rounded-2xl bg-canvas p-4">
+								<p class="text-[11px] font-bold uppercase tracking-wide text-mute">Why it's underrated</p>
+								<p class="mt-1.5 text-sm leading-relaxed text-body">{gem.whyUnderrated}</p>
+							</div>
+
+							<a
+								href={gem.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="mt-5 inline-flex items-center justify-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
+							>
+								Try {gem.name}
+								<Icon name="arrow-right" class="h-4 w-4" />
+							</a>
+						</div>
+					</article>
+				);
+			})
+		}
+	</div>
+
+	<a href="/hidden-gems/" class="reveal mt-6 flex items-center justify-center gap-1 text-sm font-bold text-ink hover:text-primary sm:hidden">
+		View all hidden gems
+		<Icon name="arrow-right" class="h-4 w-4" />
+	</a>
+</section>
+
+<style>
+	/* Renders the target site at desktop width inside the card, then scales
+	   it down to fit — a true live render rather than a static screenshot,
+	   without the site's real layout collapsing into a mobile view. Scale
+	   and width are reciprocals (1 / 0.34 ≈ 294%) so the iframe's visual
+	   width always fills the card regardless of the card's own pixel size. */
+	.gem-preview__frame {
+		position: relative;
+		width: 100%;
+		padding-top: 62%;
+		overflow: hidden;
+	}
+
+	.gem-preview__iframe {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 294%;
+		height: 294%;
+		border: 0;
+		transform: scale(0.34);
+		transform-origin: 0 0;
+		pointer-events: none;
+	}
+
+	.gem-preview__overlay {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		background: color-mix(in srgb, var(--color-ink) 45%, transparent);
+		transition: opacity 0.2s ease;
+	}
+
+	.gem-preview:hover .gem-preview__overlay,
+	.gem-preview:focus-visible .gem-preview__overlay {
+		opacity: 1;
+	}
+
+	@media (max-width: 640px) {
+		.gem-preview__overlay {
+			opacity: 1;
+			background: color-mix(in srgb, var(--color-ink) 22%, transparent);
+		}
+	}
+</style>
