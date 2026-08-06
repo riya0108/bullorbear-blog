@@ -2,15 +2,18 @@
 import Icon from "./icons/Icon.astro";
 import { infographics } from "../data/infographics";
 
-const preview = infographics.slice(0, 8);
+const preview = infographics.slice(0, 14);
+// Duplicated so the track can loop seamlessly: translateX(-50%) always lands
+// exactly on the start of the second (identical) set.
+const marqueeItems = [...preview, ...preview];
 ---
 
 <section
 	id="infographics"
-	class="mx-auto max-w-[1600px] scroll-mt-20 px-5 py-10 sm:px-6 sm:py-14 lg:px-10 xl:px-16"
+	class="mx-auto max-w-[1600px] scroll-mt-20 py-10 sm:py-14"
 	aria-labelledby="infographics-heading"
 >
-	<div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+	<div class="flex flex-col gap-2 px-5 sm:flex-row sm:items-end sm:justify-between sm:px-6 lg:px-10 xl:px-16">
 		<div>
 			<p class="reveal inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-mute">
 				<Icon name="image-stack" class="h-4 w-4" />
@@ -33,31 +36,43 @@ const preview = infographics.slice(0, 8);
 		</a>
 	</div>
 
-	<div class="mx-auto mt-6 grid max-w-[880px] grid-cols-2 gap-4 sm:mt-8 sm:grid-cols-4 sm:gap-6">
-		{
-			preview.map((info, i) => (
-				<figure
-					class="reveal overflow-hidden rounded-lg border border-ink/5 bg-surface-card shadow-sm sm:rounded-xl"
-					data-reveal-delay={Math.min(i * 40, 320)}
-				>
-					<a href={info.src} target="_blank" rel="noopener noreferrer" class="group block">
-						<span class="holo-sheen relative block overflow-hidden">
-							<img
-								src={info.src}
-								alt={info.alt}
-								loading="lazy"
-								decoding="async"
-								class="block w-full h-auto transition-transform duration-300 group-hover:scale-[1.02]"
-							/>
-						</span>
-					</a>
-					<figcaption class="px-2.5 py-2 text-xs font-semibold leading-snug text-ink sm:px-3 sm:py-2.5 sm:text-sm">{info.caption}</figcaption>
-				</figure>
-			))
-		}
+	<div class="reveal marquee-wrapper mt-6 px-5 sm:mt-8 sm:px-6 lg:px-10 xl:px-16" data-reveal-delay="140">
+		<div class="marquee-track">
+			{
+				marqueeItems.map((info, i) => {
+					const duplicate = i >= preview.length;
+					return (
+						<figure class="marquee-card group relative shrink-0 overflow-hidden rounded-lg border border-ink/5 bg-surface-card shadow-sm sm:rounded-xl">
+							<a
+								href={info.src}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="block"
+								tabindex={duplicate ? -1 : 0}
+								aria-hidden={duplicate ? "true" : undefined}
+							>
+								<span class="holo-sheen relative block overflow-hidden">
+									<img
+										src={info.src}
+										alt={info.alt}
+										title={info.title}
+										loading="lazy"
+										decoding="async"
+										class="block w-full h-auto"
+									/>
+								</span>
+								<figcaption class="px-2.5 py-2 text-xs font-semibold leading-snug text-ink sm:px-3 sm:py-2.5 sm:text-sm">
+									{info.caption}
+								</figcaption>
+							</a>
+						</figure>
+					);
+				})
+			}
+		</div>
 	</div>
 
-	<div class="mt-6 flex justify-center sm:mt-8">
+	<div class="mt-6 flex justify-center px-5 sm:mt-8 sm:px-6 lg:px-10 xl:px-16">
 		<a
 			href="/infographics/"
 			class="reveal inline-flex items-center gap-1.5 rounded-full bg-ink px-5 py-2.5 text-sm font-bold text-canvas hover:opacity-90"
@@ -68,7 +83,141 @@ const preview = infographics.slice(0, 8);
 	</div>
 </section>
 
+<script>
+	// Keeps the hovered card's zoom fully inside the marquee's clipped
+	// viewport: the scale factor and horizontal shift are both computed
+	// from the card's live position so the popped-out image never gets
+	// cut off at the left/right edge, however close to the edge it is.
+	const MAX_SCALE = 1.55;
+	const EDGE_MARGIN = 0.94;
+
+	const wrapper = document.querySelector<HTMLElement>(".marquee-wrapper");
+	const cards = document.querySelectorAll<HTMLElement>(".marquee-card");
+
+	function applyZoom(card: HTMLElement) {
+		if (!wrapper) return;
+		const wrapperRect = wrapper.getBoundingClientRect();
+		const cardRect = card.getBoundingClientRect();
+
+		const maxScaleByWidth = (wrapperRect.width / cardRect.width) * EDGE_MARGIN;
+		const scale = Math.min(MAX_SCALE, maxScaleByWidth);
+
+		const cardCenter = cardRect.left + cardRect.width / 2;
+		const scaledHalfWidth = (cardRect.width * scale) / 2;
+		const overflowLeft = wrapperRect.left - (cardCenter - scaledHalfWidth);
+		const overflowRight = cardCenter + scaledHalfWidth - wrapperRect.right;
+
+		let shift = 0;
+		if (overflowLeft > 0) shift += overflowLeft;
+		if (overflowRight > 0) shift -= overflowRight;
+
+		card.style.setProperty("--zoom-scale", scale.toFixed(3));
+		card.style.setProperty("--zoom-shift", `${shift.toFixed(1)}px`);
+		card.classList.add("is-zoomed");
+	}
+
+	function clearZoom(card: HTMLElement) {
+		card.classList.remove("is-zoomed");
+	}
+
+	cards.forEach((card) => {
+		card.addEventListener("pointerenter", () => applyZoom(card));
+		card.addEventListener("pointerleave", () => clearZoom(card));
+		card.addEventListener("focusin", () => applyZoom(card));
+		card.addEventListener("focusout", () => clearZoom(card));
+	});
+</script>
+
 <style>
+	/* Infinite slow-scrolling marquee. The track holds two identical copies
+	   of the preview set back to back, so animating from translateX(0) to
+	   translateX(-50%) loops seamlessly at the exact halfway point. */
+	.marquee-wrapper {
+		/* Both axes must be a non-"visible" value together — pairing
+		   overflow-x: hidden with overflow-y: visible makes the browser
+		   compute overflow-y as auto per spec, which is what was drawing
+		   the vertical scrollbar. overflow-y: hidden avoids that. The
+		   padding-block below is real reserved space (not cancelled by a
+		   matching negative margin) so a zoomed card has genuine room to
+		   grow into above and below, instead of overlapping the heading
+		   or the button that follows. */
+		overflow: hidden;
+		padding-block: 5.5rem;
+	}
+
+	.marquee-track {
+		display: flex;
+		width: max-content;
+		gap: 1.25rem;
+		animation: marquee-scroll 75s linear infinite;
+	}
+
+	/* Pausing keys off :has() on an actual card, not the wrapper, so idle
+	   space between cards doesn't also freeze the scroll. */
+	.marquee-track:has(.marquee-card:hover),
+	.marquee-track:has(.marquee-card:focus-within) {
+		animation-play-state: paused;
+	}
+
+	.marquee-card {
+		width: 11rem;
+		transform-origin: center;
+		transform: translateX(0) scale(1);
+		transition:
+			transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 0.35s ease;
+		will-change: transform;
+	}
+
+	@media (min-width: 640px) {
+		.marquee-wrapper {
+			padding-block: 6.5rem;
+		}
+
+		.marquee-card {
+			width: 13.5rem;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.marquee-wrapper {
+			padding-block: 7.5rem;
+		}
+
+		.marquee-card {
+			width: 15.5rem;
+		}
+	}
+
+	/* Scale and horizontal shift are set inline by the script above, clamped
+	   to the card's live position so the enlarged image always stays fully
+	   inside the marquee's clipped viewport — never cut off left or right. */
+	.marquee-card.is-zoomed {
+		position: relative;
+		z-index: 20;
+		transform: translateX(var(--zoom-shift, 0px)) scale(var(--zoom-scale, 1.55));
+		box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.35);
+	}
+
+	@keyframes marquee-scroll {
+		from {
+			transform: translateX(0);
+		}
+		to {
+			transform: translateX(-50%);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.marquee-track {
+			animation: none;
+		}
+
+		.marquee-card.is-zoomed {
+			transition: none;
+		}
+	}
+
 	/* Holographic sheen sweep on hover — inspired by
 	   https://codepen.io/nefejames/pen/ogvNgJq. Scoped to the image only;
 	   the caption below stays untouched. */
