@@ -1,0 +1,17 @@
+# Comments are stored in a Google Sheet, written to via a Google Cloud
+# service account. Copy this file to .dev.vars (gitignored) and fill in
+# your own values for local development.
+#
+# 1. Create a Google Cloud service account with the Sheets API enabled.
+# 2. Create a JSON key for it and copy the "client_email" and "private_key".
+# 3. Create a Google Sheet with header row: timestamp, slug, name, comment, hidden
+# 4. Share the sheet with the service account's email as Editor.
+# 5. Copy the sheet ID from its URL.
+#
+# For production, set these as Worker secrets instead:
+#   npx wrangler secret put GOOGLE_SERVICE_ACCOUNT_EMAIL
+#   npx wrangler secret put GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
+#   npx wrangler secret put GOOGLE_SHEET_ID
+GOOGLE_SERVICE_ACCOUNT_EMAIL=
+GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+GOOGLE_SHEET_ID=

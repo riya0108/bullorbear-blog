@@ -1,69 +1,172 @@
 ---
-const repo = import.meta.env.PUBLIC_GISCUS_REPO;
-const repoId = import.meta.env.PUBLIC_GISCUS_REPO_ID;
-const category = import.meta.env.PUBLIC_GISCUS_CATEGORY;
-const categoryId = import.meta.env.PUBLIC_GISCUS_CATEGORY_ID;
-
-const isConfigured = Boolean(repo && repoId && category && categoryId);
+const slug = Astro.url.pathname;
 ---
 
-<section class="mx-auto max-w-4xl px-5 py-12 sm:px-6 lg:px-10" aria-labelledby="comments-heading">
+<section
+	class="mx-auto max-w-4xl px-5 py-12 sm:px-6 lg:px-10"
+	aria-labelledby="comments-heading"
+	data-comments-root
+	data-comments-slug={slug}
+>
 	<h2 id="comments-heading" class="mb-6 text-xl font-extrabold text-ink">Discussion</h2>
-	{
-		isConfigured ? (
-			<div class="giscus" />
-		) : (
-			<div class="rounded-2xl bg-surface-card p-6 text-sm text-mute">
-				Comments aren't connected yet. Add your{" "}
-				<code class="rounded bg-secondary-bg px-1.5 py-0.5 text-xs">PUBLIC_GISCUS_*</code>{" "}
-				values (from{" "}
-				<a href="https://giscus.app" class="font-semibold text-ink underline" target="_blank" rel="noopener noreferrer">
-					giscus.app
-				</a>
-				) to turn on threaded, GitHub-backed discussion here.
-			</div>
-		)
-	}
+
+	<div data-comments-status class="mb-6 text-sm text-mute">Loading comments…</div>
+
+	<ul data-comments-list class="mb-8 space-y-4"></ul>
+
+	<form data-comments-form class="rounded-2xl bg-surface-card p-6">
+		<div class="mb-4">
+			<label for="comment-name" class="mb-1 block text-sm font-semibold text-ink">Name</label>
+			<input
+				id="comment-name"
+				name="name"
+				type="text"
+				required
+				maxlength="80"
+				class="w-full rounded-lg border border-secondary-bg bg-transparent px-3 py-2 text-sm text-ink outline-none focus:border-primary"
+				placeholder="Your name"
+			/>
+		</div>
+		<div class="mb-4">
+			<label for="comment-body" class="mb-1 block text-sm font-semibold text-ink">Comment</label>
+			<textarea
+				id="comment-body"
+				name="comment"
+				required
+				maxlength="2000"
+				rows="4"
+				class="w-full rounded-lg border border-secondary-bg bg-transparent px-3 py-2 text-sm text-ink outline-none focus:border-primary"
+				placeholder="Write a comment…"
+			></textarea>
+		</div>
+		<div class="hidden" aria-hidden="true">
+			<label for="comment-website">Website</label>
+			<input id="comment-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+		</div>
+		<div class="flex items-center justify-between gap-4">
+			<p data-comments-error class="hidden text-sm text-red-500"></p>
+			<button
+				type="submit"
+				class="ml-auto rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+			>
+				Post comment
+			</button>
+		</div>
+	</form>
 </section>
 
-{
-	isConfigured && (
-		<script
-			is:inline
-			src="https://giscus.app/client.js"
-			data-repo={repo}
-			data-repo-id={repoId}
-			data-category={category}
-			data-category-id={categoryId}
-			data-mapping="pathname"
-			data-strict="0"
-			data-reactions-enabled="1"
-			data-emit-metadata="0"
-			data-input-position="bottom"
-			data-theme="preferred_color_scheme"
-			data-lang="en"
-			crossorigin="anonymous"
-			async
-		/>
-	)
-}
-
 <script>
-	function currentGiscusTheme() {
-		return document.documentElement.classList.contains("dark") ? "dark" : "light";
+	interface CommentItem {
+		name: string;
+		comment: string;
+		timestamp: string;
 	}
 
-	function sendTheme() {
-		const iframe = document.querySelector<HTMLIFrameElement>("iframe.giscus-frame");
-		iframe?.contentWindow?.postMessage(
-			{ giscus: { setConfig: { theme: currentGiscusTheme() } } },
-			"https://giscus.app",
-		);
-	}
+	const root = document.querySelector<HTMLElement>('[data-comments-root]');
+	if (root) {
+		const slug = root.dataset.commentsSlug ?? '';
+		const status = root.querySelector<HTMLElement>('[data-comments-status]')!;
+		const list = root.querySelector<HTMLUListElement>('[data-comments-list]')!;
+		const form = root.querySelector<HTMLFormElement>('[data-comments-form]')!;
+		const errorEl = form.querySelector<HTMLElement>('[data-comments-error]')!;
+		const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
 
-	const observer = new MutationObserver(sendTheme);
-	observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-	window.addEventListener("message", (event) => {
-		if (event.origin === "https://giscus.app" && event.data?.giscus) sendTheme();
-	});
+		function formatDate(iso: string): string {
+			try {
+				return new Date(iso).toLocaleDateString(undefined, {
+					year: 'numeric',
+					month: 'short',
+					day: 'numeric',
+				});
+			} catch {
+				return '';
+			}
+		}
+
+		function renderComment(item: CommentItem): void {
+			const li = document.createElement('li');
+			li.className = 'rounded-2xl bg-surface-card p-4';
+
+			const header = document.createElement('div');
+			header.className = 'mb-1 flex items-baseline gap-2';
+
+			const name = document.createElement('span');
+			name.className = 'text-sm font-semibold text-ink';
+			name.textContent = item.name;
+
+			const date = document.createElement('span');
+			date.className = 'text-xs text-mute';
+			date.textContent = formatDate(item.timestamp);
+
+			header.append(name, date);
+
+			const body = document.createElement('p');
+			body.className = 'whitespace-pre-wrap break-words text-sm text-body';
+			body.textContent = item.comment;
+
+			li.append(header, body);
+			list.append(li);
+		}
+
+		function updateStatus(count: number): void {
+			if (count === 0) {
+				status.textContent = 'No comments yet — be the first to share your thoughts.';
+			} else {
+				status.textContent = `${count} comment${count === 1 ? '' : 's'}`;
+			}
+		}
+
+		async function loadComments(): Promise<void> {
+			try {
+				const res = await fetch(`/api/comments?slug=${encodeURIComponent(slug)}`);
+				const data = (await res.json()) as { comments?: CommentItem[]; error?: string };
+				const comments = data.comments ?? [];
+				list.innerHTML = '';
+				comments.forEach(renderComment);
+				updateStatus(comments.length);
+			} catch {
+				status.textContent = 'Comments failed to load.';
+			}
+		}
+
+		form.addEventListener('submit', async (event) => {
+			event.preventDefault();
+			errorEl.classList.add('hidden');
+
+			const formData = new FormData(form);
+			const name = String(formData.get('name') ?? '').trim();
+			const comment = String(formData.get('comment') ?? '').trim();
+			const website = String(formData.get('website') ?? '');
+
+			if (!name || !comment) return;
+
+			submitBtn.disabled = true;
+			try {
+				const res = await fetch('/api/comments', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ slug, name, comment, website }),
+				});
+				const data = (await res.json()) as CommentItem & { error?: string };
+
+				if (!res.ok) {
+					errorEl.textContent = data.error ?? 'Something went wrong. Please try again.';
+					errorEl.classList.remove('hidden');
+					return;
+				}
+
+				renderComment(data);
+				const currentCount = list.children.length;
+				updateStatus(currentCount);
+				form.reset();
+			} catch {
+				errorEl.textContent = 'Something went wrong. Please try again.';
+				errorEl.classList.remove('hidden');
+			} finally {
+				submitBtn.disabled = false;
+			}
+		});
+
+		loadComments();
+	}
 </script>
