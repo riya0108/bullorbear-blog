@@ -7,11 +7,11 @@ const categoryId = import.meta.env.PUBLIC_GISCUS_CATEGORY_ID;
 const isConfigured = Boolean(repo && repoId && category && categoryId);
 ---
 
-<section class="mx-auto max-w-3xl px-4 py-12 sm:px-0" aria-labelledby="comments-heading">
+<section class="mx-auto max-w-4xl px-5 py-12 sm:px-6 lg:px-10" aria-labelledby="comments-heading">
 	<h2 id="comments-heading" class="mb-6 text-xl font-extrabold text-ink">Discussion</h2>
 	{
 		isConfigured ? (
-			<div id="giscus-container" data-giscus />
+			<div class="giscus" />
 		) : (
 			<div class="rounded-2xl bg-surface-card p-6 text-sm text-mute">
 				Comments aren't connected yet. Add your{" "}
