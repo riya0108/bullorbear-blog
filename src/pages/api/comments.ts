@@ -44,6 +44,10 @@ export const POST: APIRoute = async ({ request }) => {
 	const config = getSheetsConfig();
 	if (!config) return json({ error: 'Comments are not configured' }, 503);
 
+	const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
+	const { success } = await env.COMMENTS_RATE_LIMITER.limit({ key: ip });
+	if (!success) return json({ error: 'Too many comments — please slow down.' }, 429);
+
 	let body: { slug?: string; name?: string; comment?: string; website?: string };
 	try {
 		body = await request.json();
