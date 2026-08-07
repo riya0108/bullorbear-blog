@@ -23,7 +23,11 @@
       "Bash(xargs -I{} sh -c 'echo {}: $\\(grep -c \"^## \" {}\\)')",
       "Bash(sort -t: -k2 -n)",
       "Bash(npm run *)",
-      "Bash(npx wrangler *)"
+      "Bash(npx wrangler *)",
+      "Bash(git commit *)",
+      "WebFetch(domain:bullorbear.in)",
+      "Bash(sips --version)",
+      "Bash(sips -s format webp \"/Users/teri/Downloads/Top 10 Gold ETFs.png\" --out test.webp)"
     ]
   }
 }
