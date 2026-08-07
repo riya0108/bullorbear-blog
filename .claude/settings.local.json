@@ -27,7 +27,8 @@
       "Bash(git commit *)",
       "WebFetch(domain:bullorbear.in)",
       "Bash(sips --version)",
-      "Bash(sips -s format webp \"/Users/teri/Downloads/Top 10 Gold ETFs.png\" --out test.webp)"
+      "Bash(sips -s format webp \"/Users/teri/Downloads/Top 10 Gold ETFs.png\" --out test.webp)",
+      "Bash(npm install *)"
     ]
   }
 }
