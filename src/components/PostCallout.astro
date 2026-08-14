@@ -1,0 +1,73 @@
+---
+export interface Props {
+	variant?: "info" | "success" | "warning" | "danger" | "quote";
+	title?: string;
+	source?: string;
+}
+
+const { variant = "info", title, source } = Astro.props;
+
+/**
+ * Literal Tailwind class strings per variant (see src/lib/categoryStyles.ts's
+ * comment: the v4 content scanner is text-based, not JS-aware — building
+ * these with template strings would hide them from the scanner and
+ * silently drop the styles).
+ */
+const BORDER: Record<string, string> = {
+	info: "border-hairline",
+	success: "border-bull dark:border-bull-dark",
+	warning: "border-amber-500",
+	danger: "border-bear",
+	quote: "border-primary",
+};
+const BG: Record<string, string> = {
+	info: "bg-surface-card",
+	success: "bg-bull/10 dark:bg-bull-dark/10",
+	warning: "bg-amber-500/10",
+	danger: "bg-bear/10",
+	quote: "bg-surface-card",
+};
+const TITLE_COLOR: Record<string, string> = {
+	info: "text-mute",
+	success: "text-bull dark:text-bull-dark",
+	warning: "text-amber-600 dark:text-amber-400",
+	danger: "text-bear",
+	quote: "text-mute",
+};
+
+const border = BORDER[variant] ?? BORDER.info;
+const bg = BG[variant] ?? BG.info;
+const titleColor = TITLE_COLOR[variant] ?? TITLE_COLOR.info;
+---
+
+<div class={`not-prose my-6 rounded-2xl border-l-4 p-5 ${border} ${bg}`}>
+	{title && <p class={`text-xs font-bold uppercase tracking-wide ${titleColor}`}>{title}</p>}
+	<div
+		class={`post-callout-body text-sm leading-relaxed text-body ${variant === "quote" ? "italic" : title ? "mt-1.5" : ""}`}
+	>
+		<slot />
+	</div>
+	{source && <p class="mt-3 text-xs font-bold text-primary">— {source}</p>}
+</div>
+
+<style>
+	.post-callout-body :global(p) {
+		margin: 0;
+	}
+	.post-callout-body :global(p + p) {
+		margin-top: 0.5rem;
+	}
+	.post-callout-body :global(ul) {
+		margin: 0.25rem 0 0;
+		padding-left: 1.1rem;
+		list-style: disc;
+	}
+	.post-callout-body :global(a) {
+		color: var(--color-primary);
+		font-weight: 600;
+		text-decoration: none;
+	}
+	.post-callout-body :global(a:hover) {
+		text-decoration: underline;
+	}
+</style>

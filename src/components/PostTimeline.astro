@@ -1,0 +1,41 @@
+---
+export interface Props {
+	heading?: string;
+	items: { period: string; label?: string; note: string; tone?: "default" | "peak" | "low" | "now" }[];
+}
+
+const { heading, items } = Astro.props;
+
+/** Literal class strings — see PostCallout.astro's comment on the v4 content scanner. */
+const DOT: Record<string, string> = {
+	default: "bg-mute",
+	peak: "bg-bull dark:bg-bull-dark",
+	low: "bg-bear",
+	now: "bg-primary",
+};
+---
+
+<div class="not-prose my-8 space-y-3">
+	{
+		heading && (
+			<p class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-wide text-mute">
+				<span class="h-1.5 w-1.5 rounded-full bg-primary" />
+				{heading}
+			</p>
+		)
+	}
+	<div class="space-y-4 border-l-2 border-hairline pl-5">
+		{
+			items.map((item) => (
+				<div class="relative">
+					<span
+						class={`absolute -left-[25px] top-1 h-3 w-3 rounded-full border-2 border-canvas ${DOT[item.tone ?? "default"] ?? DOT.default}`}
+					/>
+					<p class="text-[11px] font-bold uppercase tracking-wide text-mute">{item.period}</p>
+					{item.label && <p class="text-sm font-bold text-ink">{item.label}</p>}
+					<p class="mt-0.5 text-sm leading-relaxed text-body">{item.note}</p>
+				</div>
+			))
+		}
+	</div>
+</div>

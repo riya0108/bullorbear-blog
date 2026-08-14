@@ -1,0 +1,29 @@
+---
+export interface Props {
+	heading?: string;
+	stats: { value: string; label: string }[];
+}
+
+const { heading, stats } = Astro.props;
+---
+
+<div class="not-prose my-8 space-y-3">
+	{
+		heading && (
+			<p class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-wide text-mute">
+				<span class="h-1.5 w-1.5 rounded-full bg-primary" />
+				{heading}
+			</p>
+		)
+	}
+	<div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+		{
+			stats.map((stat) => (
+				<div class="rounded-2xl border border-hairline bg-surface-card p-4">
+					<p class="text-xl font-extrabold text-ink sm:text-2xl">{stat.value}</p>
+					<p class="mt-1 text-xs leading-snug text-mute">{stat.label}</p>
+				</div>
+			))
+		}
+	</div>
+</div>

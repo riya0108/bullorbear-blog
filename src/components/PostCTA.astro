@@ -1,0 +1,27 @@
+---
+export interface Props {
+	heading?: string;
+	text?: string;
+	href?: string;
+	buttonText?: string;
+}
+
+const {
+	heading = "Enjoyed this one?",
+	text = "Read more from the archive.",
+	href = "/latest/",
+	buttonText = "Read My Previous Blogs",
+} = Astro.props;
+---
+
+<div class="not-prose my-10 rounded-2xl bg-surface-dark p-8 text-center">
+	<p class="text-lg font-extrabold text-on-dark">{heading}</p>
+	<p class="mx-auto mt-2 max-w-sm text-sm text-on-dark/70">{text}</p>
+	<a
+		href={href}
+		class="mt-5 inline-flex items-center gap-1.5 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary-pressed"
+	>
+		{buttonText}
+		<span aria-hidden="true">→</span>
+	</a>
+</div>
