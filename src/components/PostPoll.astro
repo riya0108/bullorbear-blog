@@ -4,9 +4,10 @@ export interface Props {
 	label?: string;
 	question: string;
 	options: string[];
+	image?: { src: string; alt: string };
 }
 
-const { id, label = "Quick poll", question, options } = Astro.props;
+const { id, label = "Quick poll", question, options, image } = Astro.props;
 ---
 
 <div class="not-prose my-8 rounded-2xl border border-hairline bg-surface-card p-5" data-post-poll data-poll-id={id}>
@@ -15,6 +16,13 @@ const { id, label = "Quick poll", question, options } = Astro.props;
 		{label}
 	</p>
 	<p class="mt-2 text-base font-bold text-ink">{question}</p>
+	{
+		image && (
+			<div class="my-4 overflow-hidden rounded-2xl shadow-lg shadow-black/15 dark:shadow-black/40">
+				<img src={image.src} alt={image.alt} class="w-full" loading="lazy" />
+			</div>
+		)
+	}
 	<div class="mt-3 grid gap-2" role="radiogroup" aria-label={question}>
 		{
 			options.map((opt, i) => (
@@ -24,51 +32,131 @@ const { id, label = "Quick poll", question, options } = Astro.props;
 					data-option-index={i}
 					role="radio"
 					aria-checked="false"
-					class="poll-option flex items-center gap-2.5 rounded-xl border-2 border-hairline bg-canvas px-3.5 py-2.5 text-left text-sm font-semibold text-ink transition-colors"
+					class="poll-option relative flex items-center gap-2.5 overflow-hidden rounded-xl border-2 border-hairline bg-canvas px-3.5 py-2.5 text-left text-sm font-semibold text-ink transition-colors"
 				>
-					<span class="poll-option__marker h-4 w-4 shrink-0 rounded-full border-2 border-hairline" />
-					{opt}
+					<span data-poll-fill class="poll-option__fill absolute inset-y-0 left-0 w-0 bg-primary/10" aria-hidden="true" />
+					<span class="poll-option__marker relative h-4 w-4 shrink-0 rounded-full border-2 border-hairline" />
+					<span class="relative flex-1">{opt}</span>
+					<span data-poll-pct class="relative hidden shrink-0 text-xs font-bold text-mute" />
 				</button>
 			))
 		}
 	</div>
-	<p data-poll-ack class="mt-2 hidden text-xs font-semibold text-mute">
-		Thanks for weighing in — this just highlights your own pick, no results are shown.
-	</p>
+	<p data-poll-ack class="mt-2 hidden text-xs font-semibold text-mute"></p>
 </div>
 
 <script>
 	/**
-	 * No vote-count/seed-data prop at all — this only ever highlights the
-	 * current visitor's own click, never a claimed aggregate like "42% of
-	 * readers said…" (CLAUDE.md: never fabricate facts).
+	 * Vote counts are real, backend-recorded data (POST /api/poll-votes,
+	 * stored in the same Google Sheet the comments feature already writes
+	 * to — see src/lib/googleSheets.ts) — never a fabricated aggregate.
+	 * Percentages only render once the counts actually come back from the
+	 * API, so a fetch failure just falls back to the plain "thanks" ack
+	 * instead of showing a made-up number.
 	 */
+	interface PollVoteResponse {
+		counts?: number[];
+		error?: string;
+	}
+
 	function initPoll(root: HTMLElement) {
 		const pollId = root.dataset.pollId ?? "poll";
-		const storageKey = `bob-post-poll-${window.location.pathname}-${pollId}`;
+		const slug = window.location.pathname;
+		const storageKey = `bob-post-poll-${slug}-${pollId}`;
 		const options = [...root.querySelectorAll<HTMLButtonElement>("[data-poll-option]")];
 		const ack = root.querySelector<HTMLElement>("[data-poll-ack]");
+		let answered = false;
 
-		function select(index: number, persist: boolean) {
+		function select(index: number) {
 			options.forEach((btn, i) => {
 				const isSelected = i === index;
 				btn.classList.toggle("is-selected", isSelected);
 				btn.setAttribute("aria-checked", String(isSelected));
 			});
-			ack?.classList.remove("hidden");
-			if (persist) localStorage.setItem(storageKey, String(index));
+		}
+
+		function renderCounts(counts: number[]) {
+			const total = counts.reduce((sum, n) => sum + (n ?? 0), 0);
+			if (total <= 0) {
+				if (ack) {
+					ack.textContent = "Thanks for weighing in — you're the first to answer this one.";
+					ack.classList.remove("hidden");
+				}
+				return;
+			}
+
+			options.forEach((btn, i) => {
+				const count = counts[i] ?? 0;
+				const pct = Math.round((count / total) * 100);
+				const fill = btn.querySelector<HTMLElement>("[data-poll-fill]");
+				const pctLabel = btn.querySelector<HTMLElement>("[data-poll-pct]");
+				if (fill) fill.style.width = `${pct}%`;
+				if (pctLabel) {
+					pctLabel.textContent = `${pct}%`;
+					pctLabel.classList.remove("hidden");
+				}
+			});
+
+			if (ack) {
+				ack.textContent = `Thanks for weighing in — based on ${total.toLocaleString()} vote${total === 1 ? "" : "s"} so far.`;
+				ack.classList.remove("hidden");
+			}
+		}
+
+		async function fetchCounts(): Promise<number[]> {
+			try {
+				const res = await fetch(`/api/poll-votes?slug=${encodeURIComponent(slug)}&pollId=${encodeURIComponent(pollId)}`);
+				const data = (await res.json()) as PollVoteResponse;
+				return data.counts ?? [];
+			} catch {
+				return [];
+			}
+		}
+
+		async function castVote(index: number) {
+			try {
+				const res = await fetch("/api/poll-votes", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ slug, pollId, optionIndex: index }),
+				});
+				const data = (await res.json()) as PollVoteResponse;
+				if (data.counts) {
+					renderCounts(data.counts);
+					return;
+				}
+			} catch {
+				// fall through to a plain fetch of current counts below
+			}
+			renderCounts(await fetchCounts());
 		}
 
 		options.forEach((btn) => {
 			btn.addEventListener("click", () => {
+				if (answered) return;
 				const index = Number(btn.dataset.optionIndex ?? "-1");
 				if (index < 0) return;
-				select(index, true);
+				answered = true;
+				select(index);
+				localStorage.setItem(storageKey, String(index));
+				if (ack) {
+					ack.textContent = "Thanks for weighing in — tallying the results…";
+					ack.classList.remove("hidden");
+				}
+				void castVote(index);
 			});
 		});
 
 		const stored = localStorage.getItem(storageKey);
-		if (stored !== null) select(Number(stored), false);
+		if (stored !== null) {
+			answered = true;
+			select(Number(stored));
+			if (ack) {
+				ack.textContent = "Loading results…";
+				ack.classList.remove("hidden");
+			}
+			void fetchCounts().then(renderCounts);
+		}
 	}
 
 	document.querySelectorAll<HTMLElement>("[data-post-poll]").forEach(initPoll);
@@ -81,5 +169,8 @@ const { id, label = "Quick poll", question, options } = Astro.props;
 	.poll-option.is-selected .poll-option__marker {
 		border-color: var(--color-ink);
 		background: var(--color-ink);
+	}
+	.poll-option__fill {
+		transition: width 0.5s ease-out;
 	}
 </style>
