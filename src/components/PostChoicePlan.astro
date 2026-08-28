@@ -1,10 +1,11 @@
 ---
 export interface Props {
 	question?: string;
+	revealLabel?: string;
 	choices: { label: string; plan: string }[];
 }
 
-const { question = "Pick what you keep postponing", choices } = Astro.props;
+const { question = "Pick what you keep postponing", revealLabel = "Your if-then plan", choices } = Astro.props;
 ---
 
 <div
@@ -28,7 +29,7 @@ const { question = "Pick what you keep postponing", choices } = Astro.props;
 		}
 	</div>
 	<div data-choice-reveal class="mt-4 hidden rounded-xl border border-hairline bg-canvas p-4 text-left">
-		<p class="text-[11px] font-bold uppercase tracking-wide text-mute">Your if-then plan</p>
+		<p class="text-[11px] font-bold uppercase tracking-wide text-mute">{revealLabel}</p>
 		<p data-choice-text class="mt-1.5 text-sm font-semibold leading-relaxed text-ink">&nbsp;</p>
 	</div>
 </div>
@@ -51,7 +52,8 @@ const { question = "Pick what you keep postponing", choices } = Astro.props;
 			btn.addEventListener("click", () => {
 				const index = Number(btn.dataset.choiceIndex ?? "-1");
 				if (index < 0 || !plans[index]) return;
-				text.textContent = plans[index];
+				// plans come from the authored MDX props, not user input
+				text.innerHTML = plans[index];
 				reveal.classList.remove("hidden");
 				buttons.forEach((b) => b.classList.remove("is-active"));
 				btn.classList.add("is-active");
