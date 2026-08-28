@@ -1,0 +1,39 @@
+---
+export interface Props {
+	label?: string;
+}
+
+const { label = "The Cost Of Waiting, Calculated Right Now" } = Astro.props;
+---
+
+<div class="not-prose my-8 rounded-2xl bg-surface-dark p-7 text-center text-on-dark" data-post-countdown>
+	<p class="text-[11px] font-bold uppercase tracking-wide text-on-dark/60">{label}</p>
+	<p class="mt-3 text-4xl font-extrabold sm:text-5xl" data-countdown-number>&ndash;</p>
+	<p class="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-on-dark/70" data-countdown-sub>Loading today's date&hellip;</p>
+</div>
+
+<script>
+	function initCountdown(root: HTMLElement) {
+		const numberEl = root.querySelector<HTMLElement>("[data-countdown-number]");
+		const subEl = root.querySelector<HTMLElement>("[data-countdown-sub]");
+		if (!numberEl || !subEl) return;
+
+		const today = new Date();
+		const dayOfWeek = today.getDay();
+		const daysUntilMonday = (1 - dayOfWeek + 7) % 7;
+
+		if (daysUntilMonday === 0) {
+			numberEl.innerHTML = `0 <span class="text-base font-semibold text-on-dark/60">days left to wait</span>`;
+			subEl.textContent =
+				"It's Monday. You have zero excuses left today — the only question is what you actually do with it.";
+		} else {
+			const dayWord = daysUntilMonday === 1 ? "day" : "days";
+			const morningWord = daysUntilMonday === 1 ? "morning" : "mornings";
+			const pronoun = daysUntilMonday === 1 ? "it" : "them";
+			numberEl.innerHTML = `${daysUntilMonday} <span class="text-base font-semibold text-on-dark/60">${dayWord}</span>`;
+			subEl.textContent = `That's ${daysUntilMonday} ${morningWord} you could already have — don't spend ${pronoun} just waiting for Monday.`;
+		}
+	}
+
+	document.querySelectorAll<HTMLElement>("[data-post-countdown]").forEach(initCountdown);
+</script>

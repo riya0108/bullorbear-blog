@@ -1,0 +1,70 @@
+---
+export interface Props {
+	question?: string;
+	choices: { label: string; plan: string }[];
+}
+
+const { question = "Pick what you keep postponing", choices } = Astro.props;
+---
+
+<div
+	class="not-prose my-8 rounded-2xl border border-hairline bg-surface-card p-6"
+	data-post-choice-plan
+	data-plans={JSON.stringify(choices.map((c) => c.plan))}
+>
+	<p class="text-center text-base font-bold text-ink">{question}</p>
+	<div class="mt-4 flex flex-wrap justify-center gap-2">
+		{
+			choices.map((c, i) => (
+				<button
+					type="button"
+					data-choice-btn
+					data-choice-index={i}
+					class="choice-btn rounded-full border-2 border-ink px-4 py-2 text-sm font-bold text-ink transition-colors"
+				>
+					{c.label}
+				</button>
+			))
+		}
+	</div>
+	<div data-choice-reveal class="mt-4 hidden rounded-xl border border-hairline bg-canvas p-4 text-left">
+		<p class="text-[11px] font-bold uppercase tracking-wide text-mute">Your if-then plan</p>
+		<p data-choice-text class="mt-1.5 text-sm font-semibold leading-relaxed text-ink">&nbsp;</p>
+	</div>
+</div>
+
+<script>
+	function initChoicePlan(root: HTMLElement) {
+		const buttons = [...root.querySelectorAll<HTMLButtonElement>("[data-choice-btn]")];
+		const reveal = root.querySelector<HTMLElement>("[data-choice-reveal]");
+		const text = root.querySelector<HTMLElement>("[data-choice-text]");
+		if (!reveal || !text) return;
+
+		let plans: string[] = [];
+		try {
+			plans = JSON.parse(root.dataset.plans ?? "[]");
+		} catch {
+			plans = [];
+		}
+
+		buttons.forEach((btn) => {
+			btn.addEventListener("click", () => {
+				const index = Number(btn.dataset.choiceIndex ?? "-1");
+				if (index < 0 || !plans[index]) return;
+				text.textContent = plans[index];
+				reveal.classList.remove("hidden");
+				buttons.forEach((b) => b.classList.remove("is-active"));
+				btn.classList.add("is-active");
+			});
+		});
+	}
+
+	document.querySelectorAll<HTMLElement>("[data-post-choice-plan]").forEach(initChoicePlan);
+</script>
+
+<style>
+	.choice-btn.is-active {
+		background: var(--color-ink);
+		color: var(--color-canvas);
+	}
+</style>
