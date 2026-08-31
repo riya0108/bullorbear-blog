@@ -99,9 +99,23 @@ const categories = await getCollection("categories");
 		</div>
 	</div>
 
+	{/*
+		Google's translate widget needs to init into an element that is
+		actually laid out (not display:none) to reliably populate its hidden
+		language <select>. The two LanguageSwitcher instances above are each
+		hidden at one breakpoint or the other (mobile menu closed, desktop
+		pill hidden on small screens) and used to each render their own
+		id="google_translate_element" div, which was not just an invalid
+		duplicate-id situation but meant the widget could init into whichever
+		copy happened to be display:none at the time. Render it exactly once
+		here, always present and never display:none — sr-only keeps it out of
+		the visual layout without hiding it from layout measurement.
+	*/}
+	<div id="google_translate_element" class="sr-only"></div>
+
 	<div
 		id="mobile-menu"
-		class="hidden border-t border-hairline bg-canvas px-5 py-4 lg:hidden"
+		class="hidden max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-hairline bg-canvas px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 lg:hidden"
 	>
 		<nav class="flex flex-col gap-1" aria-label="Mobile">
 			<a href="/latest/" class="rounded-xl px-3 py-2.5 text-sm font-bold text-ink hover:bg-surface-card">Latest</a>

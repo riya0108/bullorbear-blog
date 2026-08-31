@@ -404,6 +404,10 @@ body {
 	top: 0 !important;
 }
 
-#google_translate_element {
-	display: none;
-}
+/* NOTE: #google_translate_element must stay visually hidden via the
+   sr-only class on the element itself (see Header.astro), not
+   display:none here. Google's widget script needs the container to
+   actually be laid out to finish initializing — with display:none it
+   creates the hidden <select class="goog-te-combo"> but never
+   populates it with language <option>s, so switching languages
+   silently does nothing. This is intentionally not re-added. */
