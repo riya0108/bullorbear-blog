@@ -1,16 +1,24 @@
 ---
 import Icon from "./icons/Icon.astro";
 import { languages } from "../lib/i18n";
+
+// Header renders this component twice (desktop nav + mobile menu), so the
+// select needs a unique id per instance rather than a hardcoded one —
+// otherwise both would share the same id and only the first would ever get
+// wired up by document.getElementById.
+const uid = crypto.randomUUID();
+const selectId = `lang-select-${uid}`;
 ---
 
 <div class="relative shrink-0">
-	<label class="sr-only" for="lang-select">Translate this page</label>
+	<label class="sr-only" for={selectId}>Translate this page</label>
 	<div
 		class="flex h-10 items-center gap-1.5 rounded-full bg-surface-card pl-3 pr-2 text-ink transition-colors hover:bg-secondary-bg"
 	>
 		<Icon name="globe" class="h-4 w-4 shrink-0" />
 		<select
-			id="lang-select"
+			id={selectId}
+			data-lang-select
 			class="notranslate h-full cursor-pointer appearance-none bg-transparent pr-5 text-sm font-semibold outline-none"
 		>
 			{languages.map((l) => <option value={l.code}>{l.label}</option>)}
@@ -22,11 +30,24 @@ import { languages } from "../lib/i18n";
 <script>
 	import { currentPageLanguage, setPageLanguage } from "../lib/i18n";
 
-	const select = document.getElementById("lang-select") as HTMLSelectElement | null;
-	if (select) {
+	// Every instance of this component on the page (desktop + mobile) shares
+	// this one module-scoped script (Astro dedupes identical component
+	// scripts), so wire up all of them here and keep them in sync.
+	// worker-configuration.d.ts (Cloudflare's generated Workers types) augments
+	// the global `Element` interface, which breaks TypeScript's usual
+	// HTMLElement → HTMLSelectElement narrowing here — route through `unknown`.
+	const selects = Array.from(
+		document.querySelectorAll("[data-lang-select]"),
+	) as unknown as HTMLSelectElement[];
+	selects.forEach((select) => {
 		select.value = currentPageLanguage();
-		select.addEventListener("change", () => setPageLanguage(select.value));
-	}
+		select.addEventListener("change", () => {
+			selects.forEach((other) => {
+				if (other !== select) other.value = select.value;
+			});
+			void setPageLanguage(select.value);
+		});
+	});
 
 	// Load the Google Translate widget lazily; it only needs to exist so the
 	// googtrans cookie set above actually takes effect on this page.

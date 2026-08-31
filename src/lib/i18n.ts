@@ -35,8 +35,37 @@ export function currentPageLanguage(): string {
 	return parts[1] ?? "en";
 }
 
-/** Sets the googtrans cookie for the given language and reloads the page. */
-export function setPageLanguage(lang: string) {
+/** Google Translate exposes a hidden <select class="goog-te-combo"> once its
+ * widget has initialized; driving it directly re-translates the page in
+ * place instead of requiring a full reload. */
+function findGoogleCombo(): HTMLSelectElement | null {
+	return document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
+}
+
+function waitForGoogleCombo(timeoutMs = 8000): Promise<HTMLSelectElement | null> {
+	return new Promise((resolve) => {
+		const existing = findGoogleCombo();
+		if (existing) {
+			resolve(existing);
+			return;
+		}
+		const start = Date.now();
+		const poll = window.setInterval(() => {
+			const combo = findGoogleCombo();
+			if (combo || Date.now() - start > timeoutMs) {
+				window.clearInterval(poll);
+				resolve(combo);
+			}
+		}, 100);
+	});
+}
+
+/** Sets the googtrans cookie (so later page loads land pre-translated) and
+ * applies the language to the current page immediately via Google
+ * Translate's own hidden control, avoiding a full reload. Falls back to a
+ * reload only if the widget never finished initializing (e.g. still loading,
+ * or blocked). */
+export async function setPageLanguage(lang: string) {
 	const hostname = window.location.hostname;
 	if (lang === "en") {
 		document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -45,5 +74,14 @@ export function setPageLanguage(lang: string) {
 		document.cookie = `googtrans=/en/${lang}; path=/`;
 		document.cookie = `googtrans=/en/${lang}; path=/; domain=${hostname}`;
 	}
-	window.location.reload();
+
+	const combo = await waitForGoogleCombo();
+	if (!combo) {
+		window.location.reload();
+		return;
+	}
+	// The combo has no "English" option — setting it back to "" is Google's
+	// own mechanism for restoring the original, untranslated text.
+	combo.value = lang === "en" ? "" : lang;
+	combo.dispatchEvent(new Event("change"));
 }
