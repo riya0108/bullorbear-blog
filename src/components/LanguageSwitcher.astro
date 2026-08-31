@@ -19,7 +19,7 @@ const selectId = `lang-select-${uid}`;
 		<select
 			id={selectId}
 			data-lang-select
-			class="notranslate h-full cursor-pointer appearance-none bg-transparent pr-5 text-sm font-semibold outline-none"
+			class="notranslate h-full cursor-pointer appearance-none bg-transparent pr-5 text-sm font-semibold outline-none disabled:cursor-wait disabled:opacity-60"
 		>
 			{languages.map((l) => <option value={l.code}>{l.label}</option>)}
 		</select>
@@ -39,13 +39,30 @@ const selectId = `lang-select-${uid}`;
 	const selects = Array.from(
 		document.querySelectorAll("[data-lang-select]"),
 	) as unknown as HTMLSelectElement[];
+
+	// Guards against firing a second language switch while one is still in
+	// flight — doing so left Google Translate's hidden control in an
+	// inconsistent state where the visible text stopped matching whatever
+	// language was actually selected.
+	let switching = false;
+
 	selects.forEach((select) => {
 		select.value = currentPageLanguage();
 		select.addEventListener("change", () => {
+			if (switching) return;
+			const target = select.value;
+			switching = true;
 			selects.forEach((other) => {
-				if (other !== select) other.value = select.value;
+				other.value = target;
+				other.disabled = true;
 			});
-			void setPageLanguage(select.value);
+			void setPageLanguage(target).finally(() => {
+				switching = false;
+				selects.forEach((other) => {
+					other.disabled = false;
+				});
+				window.dispatchEvent(new CustomEvent("bob:language-changed", { detail: { lang: target } }));
+			});
 		});
 	});
 

@@ -60,11 +60,70 @@ function waitForGoogleCombo(timeoutMs = 8000): Promise<HTMLSelectElement | null>
 	});
 }
 
+/** Google Translate adds this class to <html> once it has started applying a
+ * translation. It flips well before a long page's text nodes have all
+ * actually been rewritten, so it's a "the switch registered" signal rather
+ * than a "the swap is finished" one — callers that need the latter should
+ * use `waitForTranslationSettle` below instead. */
+export function isPageTranslated(): boolean {
+	const root = document.documentElement.classList;
+	return root.contains("translated-ltr") || root.contains("translated-rtl");
+}
+
+/** Waits for the page to actually reach the requested language state, then
+ * for the DOM text swap to finish landing. Driving Google Translate's hidden
+ * control is asynchronous, and on a long article the translated-ltr/rtl
+ * class flips almost immediately while the actual text can take anywhere
+ * from a couple seconds to 15+ seconds to fully replace (Google rewrites it
+ * node by node, streaming translations back). Without this wait, callers
+ * (the language switcher's loading state, the "listen to article" feature)
+ * would act as though translation was instant and either look broken or read
+ * stale-language text. Rather than guess a fixed delay, this watches DOM
+ * mutations under <body> and resolves once they've gone quiet for a short
+ * debounce window — i.e. once the swap has actually stopped happening. */
+export async function waitForTranslationSettle(targetLang: string, timeoutMs = 20000): Promise<void> {
+	if (targetLang === "en" && !isPageTranslated()) return;
+	const targetTranslated = targetLang !== "en";
+	const deadline = Date.now() + timeoutMs;
+
+	while (isPageTranslated() !== targetTranslated && Date.now() < deadline) {
+		await new Promise((resolve) => window.setTimeout(resolve, 150));
+	}
+
+	await new Promise<void>((resolve) => {
+		const DEBOUNCE_MS = 700;
+		// Deliberately does NOT arm the debounce until the first real
+		// mutation is seen. Google can take several seconds just to start
+		// rewriting a long page, and silence *before* that start looks
+		// identical to silence *after* it finishes — arming eagerly resolved
+		// this before translation had even begun.
+		let settleTimer: ReturnType<typeof window.setTimeout> | null = null;
+		let hardTimeout: ReturnType<typeof window.setTimeout>;
+		const finish = () => {
+			observer.disconnect();
+			if (settleTimer !== null) window.clearTimeout(settleTimer);
+			window.clearTimeout(hardTimeout);
+			resolve();
+		};
+		const observer = new MutationObserver(() => {
+			if (settleTimer !== null) window.clearTimeout(settleTimer);
+			settleTimer = window.setTimeout(finish, DEBOUNCE_MS);
+		});
+		observer.observe(document.body, { childList: true, characterData: true, subtree: true });
+		hardTimeout = window.setTimeout(finish, Math.max(0, deadline - Date.now()));
+	});
+}
+
 /** Sets the googtrans cookie (so later page loads land pre-translated) and
  * applies the language to the current page immediately via Google
  * Translate's own hidden control, avoiding a full reload. Falls back to a
  * reload only if the widget never finished initializing (e.g. still loading,
- * or blocked). */
+ * or blocked). Resolves once the translation has actually settled (see
+ * `waitForTranslationSettle`) — callers can use this to keep the UI locked
+ * for the duration, which also prevents firing a second switch while one is
+ * still in flight (driving the hidden combo mid-translation left it in an
+ * inconsistent state where the visible text stopped matching the selected
+ * language). */
 export async function setPageLanguage(lang: string) {
 	const hostname = window.location.hostname;
 	if (lang === "en") {
@@ -84,4 +143,5 @@ export async function setPageLanguage(lang: string) {
 	// own mechanism for restoring the original, untranslated text.
 	combo.value = lang === "en" ? "" : lang;
 	combo.dispatchEvent(new Event("change"));
+	await waitForTranslationSettle(lang);
 }

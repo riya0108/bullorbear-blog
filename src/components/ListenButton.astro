@@ -66,7 +66,7 @@ const { text } = Astro.props;
 <script type="application/json" id="tts-langs" set:html={JSON.stringify(languages)} />
 
 <script>
-	import { currentPageLanguage, setPageLanguage } from "../lib/i18n";
+	import { currentPageLanguage, setPageLanguage, waitForTranslationSettle } from "../lib/i18n";
 	import type { Language } from "../lib/i18n";
 
 	const widget = document.querySelector<HTMLElement>("[data-tts-widget]");
@@ -190,25 +190,6 @@ const { text } = Astro.props;
 				}, 1000);
 			});
 
-		// Google Translate adds this class to <html> once it has actually
-		// rewritten the page's text. We need to wait for it before reading a
-		// non-English selection — otherwise we'd speak the still-English DOM
-		// text through a foreign-language voice, which sounds badly garbled.
-		const isPageTranslated = () => {
-			const root = document.documentElement.classList;
-			return root.contains("translated-ltr") || root.contains("translated-rtl");
-		};
-
-		const waitForTranslation = async (langCode: string) => {
-			if (langCode === "en") return;
-			const timeoutMs = 6000;
-			const start = Date.now();
-			while (!isPageTranslated() && Date.now() - start < timeoutMs) {
-				if (playState !== "loading") return; // cancelled while waiting
-				await new Promise((resolve) => window.setTimeout(resolve, 150));
-			}
-		};
-
 		// Splits into paragraphs, then packs consecutive sentences up to
 		// MAX_CHUNK_CHARS into a single utterance (splitting further only when a
 		// paragraph runs long). Fewer, longer utterances means fewer audible
@@ -262,6 +243,16 @@ const { text } = Astro.props;
 			}
 		};
 
+		// Chrome's native speechSynthesis.pause()/resume() is notoriously
+		// unreliable — pause() often leaves playback silently stuck forever,
+		// which is what made Pause effectively behave like Stop. Instead we
+		// track the furthest word boundary we've actually spoken, and on
+		// pause we cancel and remember that position; resume re-speaks from
+		// there rather than relying on the engine's own pause state.
+		let currentUtteranceText = "";
+		let lastBoundaryCharIndex = 0;
+		let pendingResumeText: string | null = null;
+
 		const speakNext = () => {
 			// If we've been paused or stopped since this call was scheduled, the
 			// pause/stop handlers already own the state — do nothing here.
@@ -272,14 +263,21 @@ const { text } = Astro.props;
 				return;
 			}
 			const chunk = queue[queueIndex];
+			const textToSpeak = pendingResumeText ?? chunk.text;
+			pendingResumeText = null;
+			currentUtteranceText = textToSpeak;
+			lastBoundaryCharIndex = 0;
 			const speechLang = speechLangFor(activeLangCode);
-			const utterance = new SpeechSynthesisUtterance(chunk.text);
+			const utterance = new SpeechSynthesisUtterance(textToSpeak);
 			utterance.lang = speechLang;
 			const voice = pickVoice(speechLang);
 			if (voice) utterance.voice = voice;
 			utterance.rate = parseFloat(rateSelect?.value ?? "1");
 			utterance.volume = 1;
 			utterance.pitch = 1;
+			utterance.onboundary = (event) => {
+				lastBoundaryCharIndex = event.charIndex;
+			};
 			const advance = () => {
 				if (playState !== "playing") return;
 				queueIndex += 1;
@@ -293,18 +291,21 @@ const { text } = Astro.props;
 		const startPlayback = async () => {
 			window.speechSynthesis.cancel();
 			clearPauseTimer();
+			pendingResumeText = null;
 			playState = "loading";
 			setLoading();
 
 			const requestedLangCode = langSelect?.value ?? "en";
 			await ensureVoicesReady();
-			await waitForTranslation(requestedLangCode);
+			await waitForTranslationSettle(requestedLangCode);
 			if (playState !== "loading") return; // stopped while we were waiting
 
 			// If the requested language never finished translating, read the
 			// (still English) text with an English voice rather than forcing a
 			// mismatched foreign voice onto it.
-			activeLangCode = requestedLangCode === "en" || isPageTranslated() ? requestedLangCode : "en";
+			activeLangCode = requestedLangCode === "en" || currentPageLanguage() === requestedLangCode
+				? requestedLangCode
+				: "en";
 
 			queue = buildQueue(spokenText());
 			queueIndex = 0;
@@ -316,6 +317,7 @@ const { text } = Astro.props;
 		const stopPlayback = () => {
 			playState = "idle";
 			clearPauseTimer();
+			pendingResumeText = null;
 			window.speechSynthesis.cancel();
 			setIdle();
 		};
@@ -326,18 +328,18 @@ const { text } = Astro.props;
 			} else if (playState === "paused") {
 				playState = "playing";
 				setPlaying();
-				// If we paused mid-utterance, resume it; if we paused during the
-				// gap between sentences, there's nothing for the engine to resume
-				// so just continue the queue ourselves.
-				if (window.speechSynthesis.paused) {
-					window.speechSynthesis.resume();
-				} else {
-					speakNext();
-				}
+				speakNext();
 			} else {
 				playState = "paused";
 				clearPauseTimer();
-				window.speechSynthesis.pause();
+				// Only the mid-utterance case has a word position worth
+				// resuming from; if we're in the gap between chunks nothing is
+				// speaking, so let the next chunk simply start from its own
+				// beginning.
+				pendingResumeText = window.speechSynthesis.speaking
+					? currentUtteranceText.slice(lastBoundaryCharIndex).trim() || null
+					: null;
+				window.speechSynthesis.cancel();
 				setPaused();
 			}
 		});
@@ -347,10 +349,19 @@ const { text } = Astro.props;
 		langSelect?.addEventListener("change", () => {
 			stopPlayback();
 			if (langSelect.value !== currentPageLanguage()) {
-				// Reloads the page with the Google Translate cookie set, so the
-				// article text is actually translated before it's read aloud.
-				setPageLanguage(langSelect.value);
+				// Applies the language in place (and persists it via cookie), so
+				// the article text is actually translated before it's read aloud.
+				void setPageLanguage(langSelect.value);
 			}
+		});
+
+		// Keep this widget's own language selector (and any in-progress
+		// playback) in sync when the header's language switcher changes the
+		// page language, since that happens in place without a reload.
+		window.addEventListener("bob:language-changed", (event) => {
+			const lang = (event as CustomEvent<{ lang: string }>).detail.lang;
+			if (langSelect) langSelect.value = lang;
+			stopPlayback();
 		});
 
 		window.addEventListener("beforeunload", stopPlayback);
