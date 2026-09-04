@@ -1,0 +1,67 @@
+---
+export interface Props {
+	question: string;
+	options: { label: string; response: string }[];
+}
+
+const { question, options } = Astro.props;
+---
+
+<div class="not-prose my-8 rounded-2xl border border-hairline bg-surface-card p-6 text-center" data-honesty-poll>
+	<p class="text-base font-bold text-ink">{question}</p>
+	<div class="mt-5 flex flex-wrap justify-center gap-3">
+		{
+			options.map((opt, i) => (
+				<button type="button" class="honesty-btn rounded-full border-2 px-5 py-2.5 text-sm font-bold text-ink" data-honesty-option data-index={i}>
+					{opt.label}
+				</button>
+			))
+		}
+	</div>
+	<div data-honesty-reveal class="honesty-reveal mt-5 hidden rounded-xl border border-hairline bg-canvas p-4 text-left text-sm leading-relaxed text-body"></div>
+
+	{
+		options.map((opt, i) => (
+			<template data-honesty-response={i} set:html={opt.response} />
+		))
+	}
+</div>
+
+<script>
+	function initHonestyPoll(root: HTMLElement) {
+		const buttons = root.querySelectorAll<HTMLButtonElement>("[data-honesty-option]");
+		const reveal = root.querySelector<HTMLElement>("[data-honesty-reveal]");
+
+		buttons.forEach((btn) => {
+			btn.addEventListener("click", () => {
+				const index = btn.dataset.index;
+				const template = root.querySelector<HTMLTemplateElement>(`template[data-honesty-response="${index}"]`);
+				if (reveal && template) {
+					reveal.replaceChildren(template.content.cloneNode(true));
+					reveal.classList.remove("hidden");
+				}
+				buttons.forEach((b) => b.classList.toggle("is-active", b === btn));
+			});
+		});
+	}
+
+	document.querySelectorAll<HTMLElement>("[data-honesty-poll]").forEach(initHonestyPoll);
+</script>
+
+<style>
+	.honesty-btn {
+		border-color: var(--color-ink);
+		transition:
+			background-color 0.15s ease,
+			color 0.15s ease;
+	}
+	.honesty-btn:hover,
+	.honesty-btn.is-active {
+		background: var(--color-ink);
+		color: var(--color-canvas);
+	}
+	.honesty-reveal :global(b),
+	.honesty-reveal :global(strong) {
+		color: var(--color-ink);
+	}
+</style>

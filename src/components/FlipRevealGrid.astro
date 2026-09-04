@@ -1,0 +1,159 @@
+---
+export interface Props {
+	heading?: string;
+	sub?: string;
+	items: { number: string; icon: string; teaser: string; title: string; text: string }[];
+}
+
+const { heading, sub = "Tap each card to reveal it", items } = Astro.props;
+const lastIsLone = items.length % 2 === 1;
+---
+
+<div class="not-prose my-10" data-flip-reveal-grid>
+	{heading && <p class="text-center text-lg font-extrabold text-ink">{heading}</p>}
+	<p class="mt-1 text-center text-[11px] font-bold uppercase tracking-wide text-mute">{sub}</p>
+
+	<div class="flip-grid mt-6">
+		{
+			items.map((item, i) => (
+				<div
+					class={`flip-card ${i === items.length - 1 && lastIsLone ? "is-lone" : ""}`}
+					tabindex="0"
+					role="button"
+					aria-label={`Reveal ${item.title}`}
+					data-flip-card
+				>
+					<div class="flip-inner">
+						<div class="flip-face flip-front">
+							<div class="f-num">{item.number}</div>
+							<div class="f-icon">{item.icon}</div>
+							<div class="f-teaser">{item.teaser}</div>
+							<div class="f-hint">tap to reveal</div>
+						</div>
+						<div class="flip-face flip-back">
+							<div class="b-title">{item.title}</div>
+							<div class="b-text">{item.text}</div>
+						</div>
+					</div>
+				</div>
+			))
+		}
+	</div>
+</div>
+
+<script>
+	function initFlipGrid(root: HTMLElement) {
+		const cards = root.querySelectorAll<HTMLElement>("[data-flip-card]");
+		cards.forEach((card) => {
+			const toggle = () => card.classList.toggle("is-flipped");
+			card.addEventListener("click", toggle);
+			card.addEventListener("keydown", (e) => {
+				const evt = e as KeyboardEvent;
+				if (evt.key === "Enter" || evt.key === " ") {
+					evt.preventDefault();
+					toggle();
+				}
+			});
+		});
+	}
+
+	document.querySelectorAll<HTMLElement>("[data-flip-reveal-grid]").forEach(initFlipGrid);
+</script>
+
+<style>
+	.flip-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 14px;
+	}
+	.flip-card {
+		position: relative;
+		perspective: 1200px;
+		height: 190px;
+		cursor: pointer;
+	}
+	.flip-card.is-lone {
+		grid-column: 1 / -1;
+		width: calc(50% - 7px);
+		margin: 0 auto;
+	}
+	.flip-inner {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+		transform-style: preserve-3d;
+	}
+	.flip-card.is-flipped .flip-inner {
+		transform: rotateY(180deg);
+	}
+	.flip-face {
+		position: absolute;
+		inset: 0;
+		backface-visibility: hidden;
+		-webkit-backface-visibility: hidden;
+		border-radius: 1rem;
+		padding: 16px;
+		display: flex;
+		flex-direction: column;
+	}
+	.flip-front {
+		background: var(--color-surface-card);
+		border: 1px solid var(--color-hairline);
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+	}
+	.f-num {
+		font-size: 0.68rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--color-primary);
+		margin-bottom: 8px;
+	}
+	.f-icon {
+		font-size: 1.7rem;
+		margin-bottom: 8px;
+	}
+	.f-teaser {
+		font-size: 0.86rem;
+		font-weight: 700;
+		color: var(--color-ink);
+	}
+	.f-hint {
+		font-size: 0.68rem;
+		font-weight: 600;
+		color: var(--color-mute);
+		margin-top: 10px;
+	}
+	.flip-back {
+		background: var(--color-surface-dark);
+		color: var(--color-on-dark);
+		transform: rotateY(180deg);
+		justify-content: center;
+		overflow-y: auto;
+	}
+	.b-title {
+		font-weight: 800;
+		font-size: 0.92rem;
+		margin-bottom: 6px;
+		color: var(--color-on-dark);
+	}
+	.b-text {
+		font-size: 0.78rem;
+		line-height: 1.5;
+		color: color-mix(in srgb, var(--color-on-dark) 78%, transparent);
+	}
+	@media (max-width: 560px) {
+		.flip-grid {
+			grid-template-columns: 1fr;
+		}
+		.flip-card.is-lone {
+			width: 100%;
+		}
+		.flip-card {
+			height: 180px;
+		}
+	}
+</style>
