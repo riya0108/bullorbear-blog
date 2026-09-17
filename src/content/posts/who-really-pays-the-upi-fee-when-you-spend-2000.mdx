@@ -1,0 +1,221 @@
+---
+title: "Who Really Pays the UPI Fee When You Spend ₹2,000?"
+description: "UPI’s new rule on transactions above ₹2,000 adds a Merchant Discount Rate that sits on the merchant side. Find out who actually bears the cost and what it means for your everyday payments."
+category: business
+tags: []
+pubDate: 2026-09-17
+author: { name: "Bull or Bear Blogs", bio: "The editorial desk at Bull or Bear Blogs, covering markets, money, and the news that moves them." }
+draft: false
+---
+
+<style>{`:root{
+    --paper:#FFFFFF;
+    --ink:#181818;
+    --ink-soft:#454545;
+    --muted:#787878;
+    --muted-light:#ABABA7;
+    --border:#E9E8E5;
+    --surface:#FAF9F7;
+    --violet:#5D3FD3;
+    --gold:#D6952E;
+    --maxw:700px;
+  }
+.page{max-width:var(--maxw); margin:0 auto; padding:56px 24px 90px;}
+.kicker{
+    font-family:'Fragment Mono', monospace; font-size:.72rem; font-weight:400;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+    margin-bottom:18px;
+  }
+.dek{font-size:1.15rem; line-height:1.55; color:var(--ink-soft); margin:0 0 30px; max-width:56ch;}
+.essay p{margin:0 0 24px; color:var(--ink-soft); font-size:1.03rem;}
+.essay p:last-child{margin-bottom:0;}
+.essay strong{color:#0D0D0D; font-weight:700;}
+.essay em{color:#0D0D0D; font-style:italic;}
+.essay .source-note{font-size:.85rem; color:var(--muted);}
+.essay .disclaimer{font-size:.85rem; color:var(--muted);}
+h2.section-head{font-size:1.4rem; line-height:1.3; margin:46px 0 18px;}
+.gap-widget{background:var(--ink); border-radius:16px; padding:30px 26px; margin:30px 0; color:#F2F0EC;}
+.gap-label{font-family:'Fragment Mono', monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:#A6A2C4; text-align:center; margin-bottom:20px;}
+.gap-row{display:flex; align-items:center; justify-content:center; gap:18px; flex-wrap:wrap;}
+.gap-col{text-align:center;}
+.gap-num{font-family:'Outfit', sans-serif; font-weight:800; font-size:2.1rem; line-height:1;}
+.gap-col.guess .gap-num{color:#B8B4D6;}
+.gap-col.real .gap-num{color:#fff;}
+.gap-sub{font-family:'Fragment Mono', monospace; font-size:.68rem; color:#8B87A8; margin-top:8px;}
+.gap-arrow{font-size:1.4rem; color:var(--gold); margin-top:-14px;}
+.gap-foot{text-align:center; font-size:.86rem; color:#C6C3DE; margin-top:18px; max-width:42ch; margin-left:auto; margin-right:auto;}
+blockquote{margin:36px 0; padding:2px 0 2px 24px; border-left:2.5px solid var(--violet);}
+blockquote p{font-style:italic; font-size:1.15rem; line-height:1.5; color:#151515; margin:0;}
+.reveal-wrap{margin:34px 0;}
+.reveal-title{font-family:'Outfit', sans-serif; font-weight:700; font-size:1.02rem; text-align:center; margin-bottom:4px;}
+.reveal-sub{font-family:'Fragment Mono', monospace; font-size:.7rem; color:var(--muted-light); text-align:center; margin-bottom:22px;}
+.flip-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.flip-card{perspective:1200px; height:168px; cursor:pointer;}
+.flip-inner{position:relative; width:100%; height:100%; transition:transform .55s cubic-bezier(.4,.2,.2,1); transform-style:preserve-3d;}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+.flip-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:16px 16px; display:flex; flex-direction:column;}
+.flip-front{background:var(--surface); border:1px solid var(--border); align-items:center; justify-content:center; text-align:center;}
+.flip-front .num{font-family:'Fragment Mono', monospace; font-size:.68rem; color:var(--violet); letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px;}
+.flip-front .icon{font-size:1.7rem; margin-bottom:8px;}
+.flip-front .teaser{font-size:.84rem; color:var(--ink-soft); font-weight:600;}
+.flip-front .tap-hint{font-family:'Fragment Mono', monospace; font-size:.6rem; color:var(--muted-light); margin-top:10px;}
+.flip-back{background:var(--violet); color:#fff; transform:rotateY(180deg); justify-content:center; overflow-y:auto;}
+.flip-back .b-title{font-family:'Outfit', sans-serif; font-weight:700; font-size:.92rem; margin-bottom:6px; color:#fff;}
+.flip-back .b-text{font-size:.76rem; line-height:1.5; color:#E6E1FA;}
+.poll{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:26px 26px 24px; margin:34px 0; text-align:center;}
+.poll-q{font-family:'Outfit', sans-serif; font-weight:700; font-size:1.05rem; color:#0D0D0D; margin-bottom:20px;}
+.poll-actions{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:6px;}
+.poll-btn{
+    font-family:'Outfit', sans-serif; font-weight:700; font-size:.86rem; color:var(--ink);
+    background:#fff; border:1.5px solid var(--ink); border-radius:30px; padding:11px 20px; cursor:pointer;
+  }
+.poll-btn:hover{background:var(--ink); color:#fff;}
+.poll-reveal{display:none; margin-top:18px; text-align:left; padding:16px 18px; background:#fff; border:1px solid var(--border); border-radius:10px; font-size:.92rem; color:var(--ink-soft); line-height:1.6;}
+.poll-reveal.show{display:block;}
+.footer{margin-top:54px; padding-top:22px; border-top:1px solid var(--border);}
+.footer p{font-family:'Figtree', sans-serif; font-size:.8rem; line-height:1.7; color:var(--muted); margin:0 0 8px;}
+@media (max-width:560px){
+
+    .page{padding:38px 18px 70px;}
+
+    .flip-grid{grid-template-columns:1fr;}
+
+    .flip-card{height:150px;}
+
+    .gap-num{font-size:1.7rem;}
+}`}</style>
+
+<section id="whats-new-in-upi-mdr">
+      <h2 class="section-head">What’s New in UPI MDR?</h2>
+<p>From 15 October 2026, UPI will charge a Merchant Discount Rate (MDR) of up to 0.4% on transactions above ₹2,000. The fee caps at ₹300 per transaction. It is a cost that merchants pay; it does not add to the customer’s payment.</p>
+<p>The rule does not affect person‑to‑person transfers, small‑merchant payments, or capital‑market transfers, which stay free or have a lower rate.</p>
+<p>The change means that the payment network can start earning from high‑value merchant transactions, but the consumer still sees the same amount debited from their account.</p>
+      <p class="source-note"><em>Source 1</em></p>
+    </section>
+    <section id="how-the-cost-breaks-down-at-2000-10000-50000-and-1-lakh">
+      <h2 class="section-head">How the Cost Breaks Down at ₹2,000, ₹10,000, ₹50,000, and ₹1 Lakh</h2>
+<p>For a standard merchant:
+• ₹2,000 – no MDR
+• ₹10,000 – ₹40 MDR (0.4% of ₹10,000)
+• ₹50,000 – ₹200 MDR
+• ₹75,000 and above – ₹300 MDR (the cap)</p>
+<p>The customer always pays the full transaction amount. The MDR sits on the merchant side and is split among banks, acquirers, and UPI apps.</p>
+<p>The key nuance is that the 0.4% is applied to the whole amount once it crosses ₹2,000, not just the excess over ₹2,000.</p>
+      <p class="source-note"><em>Source 1</em></p>
+    </section>
+    <section id="not-every-merchant-pays-04-smallmerchant-and-essentialservice-exemptions">
+      <h2 class="section-head">Not Every Merchant Pays 0.4%: Small‑Merchant and Essential‑Service Exemptions</h2>
+<p>Eligible small merchants under the P2P framework can avoid MDR even on payments above ₹2,000, provided they meet the small‑merchant criteria.</p>
+<p>Certain categories – railways, fuel, telecom, insurance, utilities – get a flat ₹5 MDR for transactions above ₹2,000.</p>
+<p>So a ₹10,000 payment to a telecom tower can cost the merchant only ₹5, while the same amount to a regular retailer costs ₹40.</p>
+<p>These exemptions keep the new rule from turning every high‑value UPI payment into a hidden cost for consumers.</p>
+      <p class="source-note"><em>Source 1</em></p>
+    </section>
+    <div class="reveal-wrap">
+      <div class="reveal-title">Which Merchant Category?</div>
+      <div class="reveal-sub">Tap each card to reveal it</div>
+      <div class="flip-grid">
+        <div class="flip-card" tabindex="0" role="button" aria-label="Reveal Which Merchant Category? 1">
+          <div class="flip-inner">
+            <div class="flip-face flip-front">
+              <div class="num">#1</div>
+              <div class="icon">🏪</div>
+              <div class="teaser">Small merchant?</div>
+              <div class="tap-hint">tap to reveal</div>
+            </div>
+            <div class="flip-face flip-back">
+              <div class="b-title">Small merchant</div>
+              <div class="b-text">If you buy from a shop that meets the small‑merchant criteria, the 0.4% MDR may be zero. Check your merchant&#39;s size before you pay.</div>
+            </div>
+          </div>
+        </div>
+        <div class="flip-card" tabindex="0" role="button" aria-label="Reveal Which Merchant Category? 2">
+          <div class="flip-inner">
+            <div class="flip-face flip-front">
+              <div class="num">#2</div>
+              <div class="icon">📞</div>
+              <div class="teaser">Essential service?</div>
+              <div class="tap-hint">tap to reveal</div>
+            </div>
+            <div class="flip-face flip-back">
+              <div class="b-title">Essential service</div>
+              <div class="b-text">Telecom, rail, fuel, utilities, insurance get a flat ₹5 MDR. A ₹10,000 bill to them costs you only ₹5.</div>
+            </div>
+          </div>
+        </div>
+        <div class="flip-card" tabindex="0" role="button" aria-label="Reveal Which Merchant Category? 3" style="grid-column: 1 / -1; width: calc(50% - 7px); margin: 0 auto;">
+          <div class="flip-inner">
+            <div class="flip-face flip-front">
+              <div class="num">#3</div>
+              <div class="icon">🛒</div>
+              <div class="teaser">Regular retailer?</div>
+              <div class="tap-hint">tap to reveal</div>
+            </div>
+            <div class="flip-face flip-back">
+              <div class="b-title">Regular retailer</div>
+              <div class="b-text">Most retailers pay the full 0.4% MDR. A ₹10,000 purchase costs the merchant ₹40, but you see no extra fee.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <blockquote><p>The real question is not whether UPI has suddenly become expensive for users.</p></blockquote>
+    <section id="capitalmarket-payments-a-lower-mdr-for-investors">
+      <h2 class="section-head">Capital‑Market Payments: A Lower MDR for Investors</h2>
+<p>Transfers to stockbrokers, mutual funds, and other capital‑market participants attract a 0.02% MDR, capped at ₹300. That means:
+• ₹10,000 – ₹2 MDR
+• ₹1 Lakh – ₹20 MDR</p>
+<p>The fee remains on the merchant side. Investors still see the exact amount debited from their bank. The lower rate keeps large investment flows affordable.</p>
+<p>This distinction matters because investment transactions are often much bigger than everyday purchases.</p>
+      <p class="source-note"><em>Source 1</em></p>
+    </section>
+    <section id="will-you-notice-a-difference-at-checkout">
+      <h2 class="section-head">Will You Notice a Difference at Checkout?</h2>
+<p>For most users, the experience stays the same. P2P transfers stay free. Payments up to ₹2,000 are free. Small merchants and capital‑market transfers stay low‑cost.</p>
+<p>In August 2026, UPI processed 24.51 billion transactions worth ₹29.82 lakh crore, with an average value of ₹1,217 – well below the ₹2,000 threshold.</p>
+<p>Large merchants may absorb the extra cost or reflect it in pricing, but customers will not see a 0.4% fee at checkout.</p>
+<p>The indirect effect could be a slight uptick in merchant‑side costs, which may influence pricing strategies over time.</p>
+      <p class="source-note"><em>Source 1</em></p>
+    </section>
+    <section id="what-payment-apps-and-banks-gain-and-lose">
+      <h2 class="section-head">What Payment Apps and Banks Gain (and Lose)</h2>
+<p>The MDR opens a revenue stream for payment apps, acquirers, and banks. However, they do not capture the full 0.4%; the fee is split among participants.</p>
+<p>A ₹10,000 transaction that generates ₹40 MDR will see that ₹40 divided across the UPI app, the merchant acquirer, and the issuer bank.</p>
+<p>Companies cannot simply multiply total volume by 0.4% to estimate revenue. They must track the share of qualifying merchant volume and the portion of MDR they retain.</p>
+<p>The new framework could improve margins for payment companies that process a large share of high‑value merchant payments, but the actual impact will only be clear after earnings disclosures.</p>
+      <p class="source-note"><em>Source 1</em></p>
+    </section>
+    <section id="what-to-do">
+      <h2 class="section-head">What this means for you</h2>
+<p>Check the merchant category of your high‑value purchases; if it’s a small‑merchant or essential‑service, the MDR may be zero or ₹5 instead of 0.4%.</p>
+    </section>
+    <section id="conclusion">
+      <h2 class="section-head">Bottom line</h2>
+<p>UPI’s new MDR rule shifts the cost of high‑value payments onto merchants, not consumers. The rule creates a modest revenue opportunity for payment ecosystems while keeping everyday users’ experience unchanged. The real question now is how payment apps and banks will capture and distribute that new fee, and whether merchants will adjust pricing to cover it.</p>
+    </section>
+
+<footer class="footer">
+    <p>https://www.indmoney.com/open-demat-account &middot; https://www.indmoney.com/mutual-funds &middot; https://www.indmoney.com/stocks/one-97-communications-ltd-share-price &middot; https://www.indmoney.com/stocks/one-mobikwik-systems-ltd-share-price</p>
+  </footer>
+
+<script>{`
+document.querySelectorAll('.flip-card').forEach(function (card) {
+  function flip() { card.classList.toggle('flipped'); }
+  card.addEventListener('click', flip);
+  card.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      flip();
+    }
+  });
+});
+
+document.querySelectorAll('.poll-btn').forEach(function (button) {
+  button.addEventListener('click', function () {
+    var choice = button.getAttribute('data-choice');
+    document.querySelectorAll('.poll-reveal').forEach(function (panel) {
+      panel.classList.toggle('show', panel.getAttribute('data-choice') === choice);
+    });
+  });
+});
+`}</script>
