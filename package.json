@@ -9,7 +9,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "lint:posts": "node scripts/check-post-theme-safety.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.2.0",
