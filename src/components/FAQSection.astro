@@ -263,19 +263,26 @@ const hiddenCount = flat.length - VISIBLE_COUNT;
 	class="mx-auto max-w-4xl px-5 py-14 sm:px-6 sm:py-20 lg:px-10"
 	aria-labelledby="faq-heading"
 >
-	<div class="reveal">
-		<p class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-mute">
-			<Icon name="message-circle" class="h-4 w-4" />
-			Frequently asked
-		</p>
-		<h2 id="faq-heading" class="mt-1 text-2xl font-extrabold text-ink sm:text-3xl">
-			Questions people ask us
-		</h2>
-		<p class="mt-3 max-w-2xl text-body">
-			Straight answers on AI, finance blogs, EMI and SIP calculators, infographics, and a few
-			things people search for while they're here.
-		</p>
-	</div>
+	<details class="group/faq reveal">
+		<summary class="flex cursor-pointer list-none items-start justify-between gap-3 [&::-webkit-details-marker]:hidden">
+			<div>
+				<p class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-mute">
+					<Icon name="message-circle" class="h-4 w-4" />
+					Frequently asked
+				</p>
+				<h2 id="faq-heading" class="mt-1 text-2xl font-extrabold text-ink sm:text-3xl">
+					Questions people ask us
+				</h2>
+				<p class="mt-3 max-w-2xl text-body">
+					Straight answers on AI, finance blogs, EMI and SIP calculators, infographics, and a few
+					things people search for while they're here.
+				</p>
+			</div>
+			<Icon
+				name="chevron-down"
+				class="mt-1 h-6 w-6 shrink-0 text-mute transition-transform group-open/faq:rotate-180"
+			/>
+		</summary>
 
 	<div class="mt-8 flex flex-col gap-8">
 		{
@@ -335,6 +342,7 @@ const hiddenCount = flat.length - VISIBLE_COUNT;
 			)
 		}
 	</div>
+	</details>
 </section>
 
 <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

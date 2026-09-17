@@ -1,15 +1,22 @@
 ---
 import { siteConfig } from "../lib/siteConfig";
+import Icon from "./icons/Icon.astro";
 ---
 
 <section
 	class="mx-auto max-w-4xl px-5 py-14 sm:px-6 sm:py-20 lg:px-10"
 	aria-labelledby="about-heading"
 >
-	<div class="reveal rounded-[2rem] bg-surface-card p-6 sm:p-10 lg:p-14">
-		<h2 id="about-heading" class="text-2xl font-extrabold text-ink sm:text-3xl">
-			About Bull or Bear
-		</h2>
+	<details class="group/about reveal rounded-[2rem] bg-surface-card p-6 sm:p-10 lg:p-14">
+		<summary class="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+			<h2 id="about-heading" class="text-2xl font-extrabold text-ink sm:text-3xl">
+				About Bull or Bear
+			</h2>
+			<Icon
+				name="chevron-down"
+				class="h-6 w-6 shrink-0 text-mute transition-transform group-open/about:rotate-180"
+			/>
+		</summary>
 		<div
 			class="prose prose-neutral mt-6 max-w-none prose-headings:font-extrabold prose-headings:tracking-tight prose-headings:text-ink prose-p:leading-relaxed prose-p:text-body prose-a:font-semibold prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-ink dark:prose-invert"
 		>
@@ -42,5 +49,5 @@ import { siteConfig } from "../lib/siteConfig";
 				None of this lives only on the website. Follow <a href={siteConfig.social.instagram} target="_blank" rel="noopener noreferrer">@bullorbear_stories on Instagram</a> and find <a href={siteConfig.social.youtube} target="_blank" rel="noopener noreferrer">BullOrBear on YouTube</a> for the same reporting in shorter, faster formats built for a scroll. Between the site, the daily quiz, and the socials, Bull or Bear publishes new blogs, <a href="/latest/">latest news</a>, and world news breakdowns every single week — so whichever way the market, or the argument, is leaning, you'll have read it here first.
 			</p>
 		</div>
-	</div>
+	</details>
 </section>
