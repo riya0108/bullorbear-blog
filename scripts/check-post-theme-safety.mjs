@@ -17,6 +17,13 @@ const POSTS_DIR = join(import.meta.dirname, "..", "src", "content", "posts");
 const HEX_COLOR = /#[0-9a-fA-F]{3,8}\b/g;
 const RAW_RGB = /\brgba?\(\s*\d/g;
 const ROOT_BLOCK = /:root\s*\{/;
+// var(--token, #fallback) is the sanctioned pattern (see htmlBuilder.ts in the
+// content-team repo): the hex only ever renders when the site's own token is
+// undefined, and disappears entirely once the var() resolves against
+// src/styles/global.css. Strip these fallback expressions before scanning so they
+// don't get flagged as hardcoded colors — only hex/rgb used OUTSIDE a var() call
+// (i.e. actually hardcoded) should trip this lint.
+const VAR_CALL = /var\([^)]*\)/g;
 
 function extractStyleBlocks(source) {
 	const blocks = [];
@@ -40,14 +47,15 @@ function checkFile(filePath) {
 				"defines its own `:root { ... }` block, which can clash with the site-wide tokens in src/styles/global.css",
 			);
 		}
-		const hexMatches = block.match(HEX_COLOR) ?? [];
+		const withoutVarFallbacks = block.replace(VAR_CALL, "");
+		const hexMatches = withoutVarFallbacks.match(HEX_COLOR) ?? [];
 		if (hexMatches.length > 0) {
 			const sample = [...new Set(hexMatches)].slice(0, 6).join(", ");
 			issues.push(
 				`hardcodes ${hexMatches.length} hex color(s) instead of theme tokens (e.g. ${sample}) — these stay fixed across light/dark mode instead of adapting`,
 			);
 		}
-		const rgbMatches = block.match(RAW_RGB) ?? [];
+		const rgbMatches = withoutVarFallbacks.match(RAW_RGB) ?? [];
 		if (rgbMatches.length > 0) {
 			issues.push(
 				`hardcodes ${rgbMatches.length} raw rgb()/rgba() color(s) instead of theme tokens`,
