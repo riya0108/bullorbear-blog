@@ -17,7 +17,11 @@ export default defineConfig({
     integrations: [
         react(),
         sitemap({
-            filter: (page) => !NOINDEX_PATHS.some((path) => new URL(page).pathname === path),
+            filter: (page) => {
+                const pathname = new URL(page).pathname;
+                // Paginated archive pages are noindexed (thin listing pages)
+                return !NOINDEX_PATHS.includes(pathname) && !/^\/latest\/\d+\/$/.test(pathname);
+            },
             serialize: (item) => {
                 const pathname = new URL(item.url).pathname;
                 if (pathname === '/') {

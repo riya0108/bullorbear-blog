@@ -1,6 +1,7 @@
 import { defineCollection, reference } from "astro:content";
 import { glob, file } from "astro/loaders";
 import { z } from "astro/zod";
+import { AUTHOR, LEGACY_AUTHOR_NAMES, MERGED_CATEGORIES } from "./lib/author";
 
 const categories = defineCollection({
 	loader: file("src/content/categories.json"),
@@ -19,15 +20,24 @@ const posts = defineCollection({
 		title: z.string(),
 		seoTitle: z.string().optional(),
 		description: z.string(),
-		category: reference("categories"),
+		category: z.preprocess(
+			(slug) => (typeof slug === "string" ? (MERGED_CATEGORIES[slug] ?? slug) : slug),
+			reference("categories"),
+		),
 		tags: z.array(z.string()).default([]),
 		pubDate: z.coerce.date(),
 		updatedDate: z.coerce.date().optional(),
-		author: z.object({
-			name: z.string(),
-			avatar: z.string().default("/authors/default.svg"),
-			bio: z.string().default(""),
-		}),
+		author: z
+			.preprocess(
+				(a) =>
+					!a || LEGACY_AUTHOR_NAMES.includes((a as { name?: string }).name ?? "") ? AUTHOR : a,
+				z.object({
+					name: z.string(),
+					avatar: z.string().default("/authors/default.svg"),
+					bio: z.string().default(""),
+				}),
+			)
+			.transform((a) => (a.name === AUTHOR.name ? { ...a, bio: a.bio || AUTHOR.bio } : a)),
 		heroImage: z.string().optional(),
 		heroImageAlt: z.string().default(""),
 		featured: z.boolean().default(false),

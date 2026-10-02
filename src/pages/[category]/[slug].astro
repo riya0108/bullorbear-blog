@@ -13,6 +13,7 @@ import TableOfContents from "../../components/TableOfContents.astro";
 import { dotClass, textClass } from "../../lib/categoryStyles";
 import { readingTime } from "../../lib/readingTime";
 import { stripMarkdown } from "../../lib/stripMarkdown";
+import { AUTHOR } from "../../lib/author";
 
 export async function getStaticPaths() {
 	const posts = await getCollection("posts", ({ data }) => !data.draft);
@@ -43,6 +44,7 @@ const relatedPosts = allPosts
 	.slice(0, 3);
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
+const authorUrl = post.data.author.name === AUTHOR.name ? AUTHOR.url : undefined;
 ---
 
 <Layout
@@ -55,6 +57,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
 		publishedTime: post.data.pubDate.toISOString(),
 		modifiedTime: post.data.updatedDate?.toISOString(),
 		author: post.data.author.name,
+		authorUrl,
 		category: category.data.name,
 		tags: post.data.tags,
 		wordCount,
@@ -86,7 +89,9 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
 		<div class="mt-6 flex flex-wrap items-center gap-3 border-y border-hairline py-4">
 			<AuthorAvatar name={post.data.author.name} class="h-10 w-10" />
 			<div class="text-sm">
-				<p class="font-bold text-ink">{post.data.author.name}</p>
+				<p class="font-bold text-ink">
+					{authorUrl ? <a href={authorUrl} rel="author" class="hover:text-primary">{post.data.author.name}</a> : post.data.author.name}
+				</p>
 				<div class="flex flex-wrap items-center gap-x-2 text-xs text-mute">
 					<time datetime={post.data.pubDate.toISOString()}>{dateLabel}</time>
 					<span aria-hidden="true">·</span>
@@ -119,6 +124,20 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).toString();
 				))
 			}
 		</div>
+
+		{
+			post.data.author.bio && (
+				<aside class="mt-10 flex items-start gap-4 rounded-2xl bg-surface-card p-5" aria-label="About the author">
+					<AuthorAvatar name={post.data.author.name} class="h-12 w-12" />
+					<div class="text-sm">
+						<p class="font-bold text-ink">
+							Written by {authorUrl ? <a href={authorUrl} rel="author" class="hover:text-primary">{post.data.author.name}</a> : post.data.author.name}
+						</p>
+						<p class="mt-1 text-mute">{post.data.author.bio}</p>
+					</div>
+				</aside>
+			)
+		}
 
 		<div class="mt-8 border-t border-hairline pt-6">
 			<ShareBar title={post.data.title} url={canonicalUrl} />

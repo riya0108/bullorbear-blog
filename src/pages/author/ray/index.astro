@@ -1,0 +1,50 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../../layouts/Layout.astro";
+import PostCard from "../../../components/PostCard.astro";
+import AuthorAvatar from "../../../components/AuthorAvatar.astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import { AUTHOR } from "../../../lib/author";
+import { siteConfig } from "../../../lib/siteConfig";
+
+const posts = (
+	await getCollection("posts", ({ data }) => !data.draft && data.author.name === AUTHOR.name)
+).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const personLd = {
+	"@context": "https://schema.org",
+	"@type": "Person",
+	name: AUTHOR.name,
+	url: new URL(AUTHOR.url, Astro.site).toString(),
+	description: AUTHOR.bio,
+	worksFor: { "@type": "Organization", name: siteConfig.name, url: Astro.site?.toString() },
+	sameAs: Object.values(siteConfig.social),
+};
+---
+
+<Layout title={`${AUTHOR.name}, author`} description={AUTHOR.bio}>
+	<Breadcrumbs items={[{ name: AUTHOR.name }]} />
+	<script type="application/ld+json" set:html={JSON.stringify(personLd)} />
+
+	<section class="mx-auto max-w-3xl px-5 pb-6 pt-14 sm:px-6 sm:pt-20">
+		<div class="flex items-center gap-5">
+			<AuthorAvatar name={AUTHOR.name} class="h-20 w-20 text-2xl" />
+			<div>
+				<span class="text-sm font-bold text-mute">Author</span>
+				<h1 class="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">{AUTHOR.name}</h1>
+			</div>
+		</div>
+		<p class="mt-6 text-lg text-body">{AUTHOR.bio}</p>
+		<p class="mt-4 text-sm text-mute">
+			Read <a href="/editorial-policy/" class="font-semibold text-primary">how articles are researched and fact-checked</a>,
+			or <a href="/contact/" class="font-semibold text-primary">get in touch</a> to report an error.
+		</p>
+	</section>
+
+	<section class="mx-auto max-w-[1600px] px-5 py-10 sm:px-6 lg:px-10 xl:px-16">
+		<h2 class="mb-6 text-2xl font-extrabold text-ink">Articles by {AUTHOR.name} ({posts.length})</h2>
+		<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+			{posts.map((post, i) => <PostCard post={post} delay={i * 60} />)}
+		</div>
+	</section>
+</Layout>

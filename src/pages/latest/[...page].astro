@@ -16,7 +16,11 @@ export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
 const { page } = Astro.props as Awaited<ReturnType<typeof getStaticPaths>>[number]["props"];
 ---
 
-<Layout title="Latest" description="The newest reads from Bull or Bear Blogs, freshest first.">
+<Layout
+	title={page.currentPage > 1 ? `Latest — page ${page.currentPage}` : "Latest"}
+	description="The newest reads from Bull or Bear Blogs, freshest first."
+	noIndex={page.currentPage > 1}
+>
 	<Breadcrumbs items={[{ name: "Latest" }]} />
 
 	<section class="mx-auto max-w-[1600px] px-5 pb-6 pt-14 sm:px-6 sm:pt-20 lg:px-10 xl:px-16">

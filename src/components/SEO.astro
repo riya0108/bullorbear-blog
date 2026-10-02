@@ -8,6 +8,7 @@ export interface Props {
 		publishedTime: string;
 		modifiedTime?: string;
 		author: string;
+		authorUrl?: string;
 		category: string;
 		tags: string[];
 		wordCount?: number;
@@ -51,7 +52,11 @@ const jsonLd = article
 			image: imageURL.toString(),
 			datePublished: article.publishedTime,
 			dateModified: article.modifiedTime ?? article.publishedTime,
-			author: { "@type": "Person", name: article.author, url: Astro.site?.toString() },
+			author: {
+				"@type": "Person",
+				name: article.author,
+				url: new URL(article.authorUrl ?? "/", Astro.site).toString(),
+			},
 			publisher,
 			mainEntityOfPage: {
 				"@type": "WebPage",
@@ -81,7 +86,7 @@ const jsonLd = article
 <meta name="description" content={description} />
 {keywords && keywords.length > 0 && <meta name="keywords" content={keywords.join(", ")} />}
 <link rel="canonical" href={canonicalURL} />
-{noIndex && <meta name="robots" content="noindex, nofollow" />}
+{noIndex && <meta name="robots" content="noindex, follow" />}
 
 <meta property="og:type" content={type} />
 <meta property="og:title" content={fullTitle} />
