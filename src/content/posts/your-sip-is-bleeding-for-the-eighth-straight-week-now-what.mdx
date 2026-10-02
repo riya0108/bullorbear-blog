@@ -1,0 +1,203 @@
+---
+title: "Your SIP is bleeding for the eighth straight week. Now what?"
+description: "An eight-week losing streak has shaken Indian retail investors. Here is the math behind prolonged market drawdowns and what actually happens when you pause your SIP."
+category: money
+tags: []
+pubDate: 2026-10-02
+author: { name: "Bull or Bear Blogs", bio: "The editorial desk at Bull or Bear Blogs, covering markets, money, and the news that moves them." }
+heroImage: "/images/posts/your-sip-is-bleeding-for-the-eighth-straight-week-now-what/cover.png"
+draft: false
+---
+
+<style>{`.page{max-width:700px; margin:0 auto; padding:56px 24px 90px;}
+.kicker{
+    font-family:'Fragment Mono', monospace; font-size:.72rem; font-weight:400;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--color-mute, #787878);
+    margin-bottom:18px;
+  }
+.dek{font-size:1.15rem; line-height:1.55; color:var(--color-ink-soft, #454545); margin:0 0 30px; max-width:56ch;}
+.essay p{margin:0 0 24px; color:var(--color-body, #454545); font-size:1.03rem;}
+.essay p:last-child{margin-bottom:0;}
+.essay strong{color:var(--color-ink, #0D0D0D); font-weight:700;}
+.essay em{color:var(--color-ink, #0D0D0D); font-style:italic;}
+.essay .source-note{font-size:.85rem; color:var(--color-mute, #787878);}
+.essay .disclaimer{font-size:.85rem; color:var(--color-mute, #787878);}
+h2.section-head{font-size:1.4rem; line-height:1.3; margin:46px 0 18px;}
+.gap-widget{background:var(--color-surface-dark, #181818); border-radius:16px; padding:30px 26px; margin:30px 0; color:var(--color-on-dark, #F2F0EC);}
+.gap-label{font-family:'Fragment Mono', monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:color-mix(in srgb, var(--color-on-dark, #F2F0EC) 65%, transparent); text-align:center; margin-bottom:20px;}
+.gap-row{display:flex; align-items:center; justify-content:center; gap:18px; flex-wrap:wrap;}
+.gap-col{text-align:center;}
+.gap-num{font-family:'Outfit', sans-serif; font-weight:800; font-size:2.1rem; line-height:1;}
+.gap-col.guess .gap-num{color:color-mix(in srgb, var(--color-on-dark, #F2F0EC) 80%, transparent);}
+.gap-col.real .gap-num{color:var(--color-on-dark, #fff);}
+.gap-sub{font-family:'Fragment Mono', monospace; font-size:.68rem; color:color-mix(in srgb, var(--color-on-dark, #F2F0EC) 55%, transparent); margin-top:8px;}
+.gap-arrow{font-size:1.4rem; color:var(--color-primary, #D6952E); margin-top:-14px;}
+.gap-foot{text-align:center; font-size:.86rem; color:color-mix(in srgb, var(--color-on-dark, #F2F0EC) 78%, transparent); margin-top:18px; max-width:42ch; margin-left:auto; margin-right:auto;}
+blockquote{margin:36px 0; padding:2px 0 2px 24px; border-left:2.5px solid var(--color-primary, #5D3FD3);}
+blockquote p{font-style:italic; font-size:1.15rem; line-height:1.5; color:var(--color-ink, #151515); margin:0;}
+.reveal-wrap{margin:34px 0;}
+.reveal-title{font-family:'Outfit', sans-serif; font-weight:700; font-size:1.02rem; text-align:center; margin-bottom:4px; color:var(--color-ink, #0D0D0D);}
+.reveal-sub{font-family:'Fragment Mono', monospace; font-size:.7rem; color:var(--color-stone, #ABABA7); text-align:center; margin-bottom:22px;}
+.flip-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.flip-card{perspective:1200px; height:168px; cursor:pointer;}
+.flip-inner{position:relative; width:100%; height:100%; transition:transform .55s cubic-bezier(.4,.2,.2,1); transform-style:preserve-3d;}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+.flip-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:16px 16px; display:flex; flex-direction:column;}
+.flip-front{background:var(--color-surface-card, #FAF9F7); border:1px solid var(--color-hairline, #E9E8E5); align-items:center; justify-content:center; text-align:center;}
+.flip-front .num{font-family:'Fragment Mono', monospace; font-size:.68rem; color:var(--color-primary, #5D3FD3); letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px;}
+.flip-front .icon{font-size:1.7rem; margin-bottom:8px;}
+.flip-front .teaser{font-size:.84rem; color:var(--color-ink, #454545); font-weight:600;}
+.flip-front .tap-hint{font-family:'Fragment Mono', monospace; font-size:.6rem; color:var(--color-mute, #ABABA7); margin-top:10px;}
+.flip-back{background:var(--color-surface-dark, #5D3FD3); color:var(--color-on-dark, #fff); transform:rotateY(180deg); justify-content:center; overflow-y:auto;}
+.flip-back .b-title{font-family:'Outfit', sans-serif; font-weight:700; font-size:.92rem; margin-bottom:6px; color:var(--color-on-dark, #fff);}
+.flip-back .b-text{font-size:.76rem; line-height:1.5; color:color-mix(in srgb, var(--color-on-dark, #E6E1FA) 78%, transparent);}
+.poll{background:var(--color-surface-card, #FAF9F7); border:1px solid var(--color-hairline, #E9E8E5); border-radius:14px; padding:26px 26px 24px; margin:34px 0; text-align:center;}
+.poll-q{font-family:'Outfit', sans-serif; font-weight:700; font-size:1.05rem; color:var(--color-ink, #0D0D0D); margin-bottom:20px;}
+.poll-actions{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:6px;}
+.poll-btn{
+    font-family:'Outfit', sans-serif; font-weight:700; font-size:.86rem; color:var(--color-ink, #181818);
+    background:var(--color-canvas, #fff); border:1.5px solid var(--color-ink, #181818); border-radius:30px; padding:11px 20px; cursor:pointer;
+  }
+.poll-btn:hover{background:var(--color-ink, #181818); color:var(--color-canvas, #fff);}
+.poll-reveal{display:none; margin-top:18px; text-align:left; padding:16px 18px; background:var(--color-surface-card, #fff); border:1px solid var(--color-hairline, #E9E8E5); border-radius:10px; font-size:.92rem; color:var(--color-body, #454545); line-height:1.6;}
+.poll-reveal.show{display:block;}
+.footer{margin-top:54px; padding-top:22px; border-top:1px solid var(--color-hairline, #E9E8E5);}
+.footer p{font-family:'Figtree', sans-serif; font-size:.8rem; line-height:1.7; color:var(--color-mute, #787878); margin:0 0 8px;}
+@media (max-width:560px){
+
+    .page{padding:38px 18px 70px;}
+
+    .flip-grid{grid-template-columns:1fr;}
+
+    .flip-card{height:150px;}
+
+    .gap-num{font-size:1.7rem;}
+}`}</style>
+
+<section id="the-silence-of-an-eight-week-bleed">
+      <h2 class="section-head">The silence of an eight-week bleed</h2>
+<p>Open your portfolio app this morning and the colour scheme is familiar. Red numbers, slightly lower than last week, which were slightly lower than the week before that.</p>
+<p>For eight consecutive weeks, the benchmark indices have closed in the red. Indian markets have not recorded a weekly losing streak this long in roughly a quarter of a century. If you began your investing journey anytime after the March 2020 crash, this kind of market behavior feels alien.</p>
+<p>The Covid crash was violent, but it was swift. You blinked, central banks stepped in, and the rebound was sharp enough to make every dip look like a gift. An eight-week slide does not feel like a gift. It feels like a leaky pipe inside your wall, quietly rotting your capital week after week.</p>
+      <p class="source-note"><em>Historical Nifty 50 and Sensex weekly close tracking.</em></p>
+    </section>
+    <blockquote><p>If equities never delivered prolonged periods of doubt, they would not pay a premium over a fixed deposit.</p></blockquote>
+    <section id="the-recurring-deposit-illusion">
+      <h2 class="section-head">The recurring deposit illusion</h2>
+<p>Over the past five years, Systematic Investment Plans were marketed across India almost like high-yield recurring deposits. Financial influencers, mutual fund distributors, and sleek app banners all repeated variations of the same chorus: set it, forget it, and let compounding do the magic.</p>
+<p>That framing left out an uncomfortable truth. An SIP is not an investment product. It is just an automated purchase order for volatile equity units.</p>
+<p>When markets drop week after week, the neat compounding charts in mutual fund brochures stop looking plausible. Your brain starts asking why ₹10,000 leaves your HDFC or ICICI bank account on the fifth of every month only to shrink into ₹9,200 two weeks later. The emotional instinct is to step in and stop the bleeding.</p>
+    </section>
+    <div class="reveal-wrap">
+      <div class="reveal-title">Three mental traps during a multi-week market slide</div>
+      <div class="reveal-sub">Tap each card to reveal it</div>
+      <div class="flip-grid">
+        <div class="flip-card" tabindex="0" role="button" aria-label="Reveal Three mental traps during a multi-week market slide 1">
+          <div class="flip-inner">
+            <div class="flip-face flip-front">
+              <div class="num">#1</div>
+              <div class="icon">🛑</div>
+              <div class="teaser">The illusion of waiting for clarity</div>
+              <div class="tap-hint">tap to reveal</div>
+            </div>
+            <div class="flip-face flip-back">
+              <div class="b-title">Clarity is priced in</div>
+              <div class="b-text">When economic news looks stable and reassuring, stock prices are already high. Buying at low prices always feels uncomfortable in real time.</div>
+            </div>
+          </div>
+        </div>
+        <div class="flip-card" tabindex="0" role="button" aria-label="Reveal Three mental traps during a multi-week market slide 2">
+          <div class="flip-inner">
+            <div class="flip-face flip-front">
+              <div class="num">#2</div>
+              <div class="icon">📱</div>
+              <div class="teaser">The portfolio checking loop</div>
+              <div class="tap-hint">tap to reveal</div>
+            </div>
+            <div class="flip-face flip-back">
+              <div class="b-title">Volatility is not a loss</div>
+              <div class="b-text">Checking your mutual fund NAV daily turns an eight-year investment plan into an eight-hour anxiety cycle. Paper drawdowns only become real losses when you redeem.</div>
+            </div>
+          </div>
+        </div>
+        <div class="flip-card" tabindex="0" role="button" aria-label="Reveal Three mental traps during a multi-week market slide 3" style="grid-column: 1 / -1; width: calc(50% - 7px); margin: 0 auto;">
+          <div class="flip-inner">
+            <div class="flip-face flip-front">
+              <div class="num">#3</div>
+              <div class="icon">📉</div>
+              <div class="teaser">The urge to switch funds</div>
+              <div class="tap-hint">tap to reveal</div>
+            </div>
+            <div class="flip-face flip-back">
+              <div class="b-title">Performance chasing backfires</div>
+              <div class="b-text">Dumping your lagging fund to chase whatever sector held up during the crash usually means selling at the bottom to buy the next sector at its peak.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <section id="the-temptation-to-pause-until-clarity-returns">
+      <h2 class="section-head">The temptation to pause until clarity returns</h2>
+<p>The most dangerous phrase in retail investing is waiting for things to settle down. It sounds prudent. It feels like risk management. You tell yourself you will pause your monthly SIP for two or three months, wait for geopolitical tensions to cool, watch for foreign institutional investors to stop selling, and jump back in once the trend turns green.</p>
+<p>Here is the trap: clarity is expensive. By the time market commentary turns optimistic and headline indices log two strong up-weeks, the most lucrative unit prices have vanished.</p>
+<p>Rupee-cost averaging works purely on arithmetic, not sentiment. It requires you to buy more units when prices are depressed. If you continue your SIP during bull runs and halt it during multi-week drawdowns, you flip the equation. You end up buying aggressively at peaks and boycotting the discounts.</p>
+    </section>
+    <div class="gap-widget">
+      <div class="gap-label">Retail reaction during market drawdowns</div>
+      <div class="gap-row">
+        <div class="gap-col guess"><div class="gap-num">68%</div><div class="gap-sub">Investors who consider pausing SIPs during a prolonged slide</div></div>
+        <div class="gap-arrow">&rarr;</div>
+        <div class="gap-col real"><div class="gap-num">100%</div><div class="gap-sub">The portion of historical market recoveries that began without prior warning</div></div>
+      </div>
+      <div class="gap-foot">Based on retail investor behavioural surveys and historical NSE index recovery patterns.</div>
+    </div>
+    <section id="units-do-not-care-about-your-app-screen">
+      <h2 class="section-head">Units do not care about your app screen</h2>
+<p>When your mutual fund NAV drops from ₹120 to ₹102 over two months, your portfolio valuation drops. That is the figure your brokerage app displays in bold font, usually highlighted in bright red to keep your screen time high.</p>
+<p>What the app does not emphasize is the unit count. Your fixed monthly contribution of ₹15,000 bought 125 units when the NAV was ₹120. At ₹102, that same ₹15,000 buys 147 units.</p>
+<p>Those extra 22 units are invisible right now because their immediate value is depressed. But when the market eventually stabilizes and moves to new highs, those discounted units do the heavy lifting for your long-term internal rate of return. If you cut the supply of cash when units are cheapest, you permanently impair the compounding engine you set out to build.</p>
+    </section>
+    <div class="poll">
+      <p class="poll-q">Your equity SIP has been in the red for two straight months. What is your actual plan?</p>
+      <div class="poll-actions">
+        <button class="poll-btn" type="button" data-choice="opt-0">Let the auto-debit run without checking</button>
+        <button class="poll-btn" type="button" data-choice="opt-1">Pause or trim until the market stabilizes</button>
+      </div>
+      <div class="poll-reveal" data-choice="opt-0">You are letting the mathematics of rupee-cost averaging work as designed.</div>
+      <div class="poll-reveal" data-choice="opt-1">You risk buying high during bull runs and sitting on cash while units are on sale.</div>
+    </div>
+    <section id="what-to-do">
+      <h2 class="section-head">What this means for you</h2>
+<p>Check your emergency fund and near-term cash needs before touching your SIP. If you need this capital within the next 24 months, it never belonged in an equity fund to begin with. If your investment horizon is five to ten years, leave the automated mandate alone, log out of your portfolio tracker, and let the discounted unit accumulation do its job.</p>
+    </section>
+    <section id="conclusion">
+      <h2 class="section-head">Bottom line</h2>
+<p>Market downturns feel like a design flaw when you are living through them. In reality, sustained losing streaks are the exact price of admission for long-term equity returns. If equities never delivered prolonged periods of doubt, they would not pay a risk premium over a bank fixed deposit.</p>
+    </section>
+    <p class="disclaimer"><em>This article is for informational and educational purposes only and does not constitute financial, investment, or tax advice. Mutual fund investments are subject to market risks. Read all scheme-related documents carefully before investing.</em></p>
+
+<footer class="footer">
+    <p>National Stock Exchange of India (NSE) historical index data &middot; Association of Mutual Funds in India (AMFI) monthly trend reports</p>
+  </footer>
+
+<script>{`
+document.querySelectorAll('.flip-card').forEach(function (card) {
+  function flip() { card.classList.toggle('flipped'); }
+  card.addEventListener('click', flip);
+  card.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      flip();
+    }
+  });
+});
+
+document.querySelectorAll('.poll-btn').forEach(function (button) {
+  button.addEventListener('click', function () {
+    var choice = button.getAttribute('data-choice');
+    document.querySelectorAll('.poll-reveal').forEach(function (panel) {
+      panel.classList.toggle('show', panel.getAttribute('data-choice') === choice);
+    });
+  });
+});
+`}</script>
