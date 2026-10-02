@@ -4,6 +4,13 @@ on:
   push:
     branches: [master]
 
+# One production deploy at a time, newest push wins. Without this, two pushes
+# seconds apart run in parallel and whichever finishes LAST goes live — an older
+# commit's build (e.g. without the newest post) could overwrite the newer one.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
